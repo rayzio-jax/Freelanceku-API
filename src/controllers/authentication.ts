@@ -19,7 +19,7 @@ export const register = async (req: express.Request, res: express.Response) => {
 		const user = await createUser({
 			email,
 			username,
-			auth: {
+			authentication: {
 				salt,
 				password: auth(salt, password),
 			},
