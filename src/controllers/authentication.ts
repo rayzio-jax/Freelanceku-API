@@ -12,7 +12,7 @@ export const login = async (req: express.Request, res: express.Response) => {
 		}
 
 		const user = await getUserByEmail(email).select(
-			"+authentication.salt +authentication+password"
+			"+authentication.salt +authentication.password"
 		);
 
 		if (!user) {
@@ -32,7 +32,7 @@ export const login = async (req: express.Request, res: express.Response) => {
 		);
 
 		await user.save();
-		res.cookie("RAND_USER_AUTH", user.authentication.sessionToken, {
+		res.cookie("FREEJOB_API", user.authentication.sessionToken, {
 			domain: "localhost",
 			path: "/",
 		});
