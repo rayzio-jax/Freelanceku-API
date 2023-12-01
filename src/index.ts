@@ -9,6 +9,7 @@ import mongoose, { Promise } from "mongoose";
 import router from "./router";
 
 const port = process.env.PORT || 8080;
+const db_url = process.env.MONGO_URL;
 
 const app: Express = express();
 
@@ -28,11 +29,15 @@ server.listen(port, () => {
 	console.log(`⚡️[server]: Server running on http://localhost:${port}/`);
 });
 
-const db =
-	"mongodb+srv://rayhan023:YZe0MD1oe0LnB5tf@api.8btaevm.mongodb.net/freelance-api?retryWrites=true&w=majority";
-
 mongoose.Promise = Promise;
-mongoose.connect(db);
-mongoose.connection.on("error", (error: Error) => console.log(error));
+mongoose.connect(db_url);
+
+const db = mongoose.connection;
+db.on("error", (error: Error) => console.log(error));
+db.once("open", () => {
+	console.log(
+		`📄[database]: Connected to database ${db.name} state ${db.readyState}`
+	);
+});
 
 app.use("/", router());
