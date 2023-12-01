@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 
+import { response } from "../response";
 import { createUser, getUserByEmail } from "../db/users";
 import { authentication, random } from "../helpers";
 
@@ -37,10 +38,11 @@ export const login = async (req: Request, res: Response) => {
 			path: "/",
 		});
 
-		res.status(200).json(user).end();
+		// res.status(200).json(user).end();
+		response(200, user, "log in: success", res);
 	} catch (error) {
 		console.log(error);
-		res.sendStatus(400);
+		return res.sendStatus(400);
 	}
 };
 
@@ -66,7 +68,8 @@ export const register = async (req: Request, res: Response) => {
 			},
 		});
 
-		return res.status(200).json(user).end();
+		// return res.status(200).json(user).end();
+		response(200, user, "register: success", res);
 	} catch (error) {
 		console.log(error);
 		return res.sendStatus(400);
