@@ -15,3 +15,9 @@ export const response = (
 		data: data,
 	});
 };
+
+export const error = (statusCode: number, message: string, res: Response) => {
+	res.status(statusCode).json({
+		message,
+	});
+};
