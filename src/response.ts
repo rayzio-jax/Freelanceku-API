@@ -6,13 +6,13 @@ export const response = (
 	res: Response
 ) => {
 	res.status(statusCode).json({
+		message,
+		data: data,
 		metadata: {
 			prev: "",
 			next: "",
 			current: "",
 		},
-		message,
-		data: data,
 	});
 };
 
