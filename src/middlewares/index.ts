@@ -24,7 +24,7 @@ export const isAuthToDelete = async (
 		next();
 	} catch (error) {
 		console.log(error);
-		return error(400, "Bad request: invalid");
+		return error(400, "Bad request: invalid", res);
 	}
 };
 
@@ -48,6 +48,6 @@ export const isAuthenticated = async (
 		return next();
 	} catch (error) {
 		console.log(error);
-		return error(400, "Bad request: invalid");
+		return error(400, "Bad request: invalid", res);
 	}
 };
