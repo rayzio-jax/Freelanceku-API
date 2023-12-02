@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 
-import { response } from "../response";
-import { deleteUserById, getUsers } from "../db/users";
+import { response, error } from "../response";
+import { deleteUserById, getUserById, getUsers } from "../db/users";
 
 export const getAllUsers = async (req: Request, res: Response) => {
 	try {
@@ -39,6 +39,26 @@ export const deleteUser = async (req: Request, res: Response) => {
 
 		// return res.json(deletedUser);
 		return response(200, deletedUser, "delete user: success", res);
+	} catch (error) {
+		console.log(error);
+		return res.sendStatus(400);
+	}
+};
+
+export const updateUser = async (req: Request, res: Response) => {
+	try {
+		const id = req.query.id as string;
+		const { username } = req.body;
+
+		if (!username) {
+			return error(400, "Username not provided!", res);
+		}
+
+		const user = await getUserById(id);
+		user.username = username;
+		await user.save();
+
+		return response(200, user, "Update username success", res);
 	} catch (error) {
 		console.log(error);
 		return res.sendStatus(400);
