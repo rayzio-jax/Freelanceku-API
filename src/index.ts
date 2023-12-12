@@ -1,4 +1,4 @@
-import express, { Express } from "express";
+import express, { Express, Request, Response } from "express";
 import http from "http";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
@@ -41,3 +41,6 @@ db.once("open", () => {
 });
 
 app.use("/", router());
+app.get("/", (req: Request, res: Response) => {
+	res.send("Welcome to my API");
+});
