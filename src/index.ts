@@ -9,7 +9,7 @@ import "dotenv/config";
 import router from "./router";
 
 const port = process.env.PORT || 8080;
-const db_url = process.env.MONGO_URL;
+const db_url = process.env.MONGODB_URI;
 
 const app: Express = express();
 
