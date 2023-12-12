@@ -6,19 +6,27 @@ This API intentionally to support integrationd data of freelancers, and for any 
 
 ## Endpoint
 #### Public endpoint
-GET
+#### GET
+Get all freelancers
 * ```bash
   /freelancers
   ```
+Get all users
 * ```bash
   /users
   ```
+#### POST
+Register new freelancers <br>
+Value: { first_name, last_name, email, password, phone, address }
+* ```bash
+  /freelancers
+  ```
 #### Endpoint (authentication required)
-GET
+#### GET
 * ```bash
   /users/all
   ```
-DELETE
+#### DELETE
 * ```bash
   /users?id={userId}
   ```
