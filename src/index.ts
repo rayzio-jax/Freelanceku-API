@@ -7,9 +7,9 @@ import cors from "cors";
 import mongoose, { Promise } from "mongoose";
 import "dotenv/config";
 import router from "./router";
+import { connectDB } from "./connection";
 
 const port = process.env.PORT || 8080;
-const db_url = process.env.MONGODB_URI;
 
 const app: Express = express();
 
@@ -26,18 +26,9 @@ app.use(bodyParser.json());
 const server = http.createServer(app);
 
 server.listen(port, () => {
-	console.log(`⚡️[server]: Server running on http://localhost:${port}/`);
+	console.log(`⚡️[server]: Server running on port ${port}`);
 });
 
-mongoose.Promise = Promise;
-mongoose.connect(db_url);
-
-const db = mongoose.connection;
-db.on("error", (error: Error) => console.log(error));
-db.once("open", () => {
-	console.log(
-		`📄[database]: Connected to database ${db.name} state ${db.readyState}`
-	);
-});
+connectDB();
 
 app.use("/", router());
