@@ -5,3 +5,20 @@ This is a public Freelance API where you can get a data of freelancers. If this 
 This API intentionally to support integrationd data of freelancers, and for any freelance market to get freelancer data to integrated each other.
 
 ## Endpoint
+Public endpoint
+GET
+* ```bash
+  /freelancers
+  ```
+* ```bash
+  /users
+  ```
+Endpoint (authentication required)
+GET
+* ```bash
+  /users/all
+  ```
+DELETE
+* ```bash
+  /users?id={userId}
+  ```
