@@ -4,8 +4,9 @@
 	"description": "",
 	"main": "index.ts",
 	"scripts": {
-		"start": "nodemon",
-		"build": "tsc -p tsconfig.json"
+		"dev": "nodemon",
+		"build": "tsc -p tsconfig.json",
+		"start": "nodemon --omit=dev"
 	},
 	"keywords": [],
 	"author": "",
