@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-import { response, error } from "../response";
+import { response, errorResponse } from "../response";
 import { createUser, getUserByEmail } from "../db/users";
 import { authentication, random } from "../helpers";
 
@@ -9,7 +9,7 @@ export const login = async (req: Request, res: Response) => {
 		const { email, password } = req.body;
 
 		if (!email || !password) {
-			return error(400, "Invalid username or email: invalid", res);
+			return errorResponse(400, "invalid username or email: Invalid", res);
 		}
 
 		const user = await getUserByEmail(email).select(
@@ -17,15 +17,15 @@ export const login = async (req: Request, res: Response) => {
 		);
 
 		if (!user) {
-			return error(400, "User not encrypted: invalid", res);
+			return errorResponse(400, "user not encrypted: Invalid", res);
 		}
 
 		const expectedHash = authentication(user.authentication.salt, password);
 
 		if (user.authentication.password != expectedHash) {
-			return error(
+			return errorResponse(
 				403,
-				"User password doesn't match with encrypted: Forbidden",
+				"user password doesn't match with encrypted: Forbidden",
 				res
 			);
 		}
@@ -46,7 +46,7 @@ export const login = async (req: Request, res: Response) => {
 		response(200, user, "log in: success", res);
 	} catch (error) {
 		console.log(error);
-		return error(400, "Bad request: invalid");
+		return errorResponse(400, "bad request: invalid", res);
 	}
 };
 
@@ -54,12 +54,12 @@ export const register = async (req: Request, res: Response) => {
 	try {
 		const { email, password, username } = req.body;
 		if (!email || !password || !username) {
-			return error(400, "Bad request: invalid", res);
+			return errorResponse(400, "bad request: invalid", res);
 		}
 
 		const existingUser = await getUserByEmail(email);
 		if (existingUser) {
-			return error(400, "Bad request: invalid", res);
+			return errorResponse(400, "bad request: invalid", res);
 		}
 
 		const salt = random();
@@ -73,9 +73,9 @@ export const register = async (req: Request, res: Response) => {
 		});
 
 		// return res.status(200).json(user).end();
-		response(200, user, "register: success", res);
+		response(200, user, "register new user: success", res);
 	} catch (error) {
 		console.log(error);
-		return error(400, "Bad request: invalid", res);
+		return errorResponse(400, "bad request: invalid", res);
 	}
 };

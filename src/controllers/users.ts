@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-import { response, error } from "../response";
+import { response, errorResponse } from "../response";
 import { deleteUserById, getUserById, getUsers } from "../db/users";
 
 export const getAllUsers = async (req: Request, res: Response) => {
@@ -11,7 +11,8 @@ export const getAllUsers = async (req: Request, res: Response) => {
 		return response(200, users, "get all users: success", res);
 	} catch (error) {
 		console.log(error);
-		return res.sendStatus(400);
+		// return res.sendStatus(400);
+		return errorResponse(400, "get all users: failed", res);
 	}
 };
 
@@ -27,7 +28,7 @@ export const getUsernameAndEmail = async (req: Request, res: Response) => {
 		return response(200, filteredQuery, "get username & email: success", res);
 	} catch (error) {
 		console.log(error);
-		return res.sendStatus(400);
+		return errorResponse(400, "get username & email: failed", res);
 	}
 };
 
@@ -41,7 +42,7 @@ export const deleteUser = async (req: Request, res: Response) => {
 		return response(200, deletedUser, "delete user: success", res);
 	} catch (error) {
 		console.log(error);
-		return res.sendStatus(400);
+		return errorResponse(400, "delete user: failed", res);
 	}
 };
 
@@ -51,16 +52,16 @@ export const updateUser = async (req: Request, res: Response) => {
 		const { username } = req.body;
 
 		if (!username) {
-			return error(400, "Username not provided!", res);
+			return errorResponse(400, "username not provided!", res);
 		}
 
 		const user = await getUserById(id);
 		user.username = username;
 		await user.save();
 
-		return response(200, user, "Update username success", res);
+		return response(200, user, "update username: success", res);
 	} catch (error) {
 		console.log(error);
-		return res.sendStatus(400);
+		return errorResponse(400, "update username: failed", res);
 	}
 };
