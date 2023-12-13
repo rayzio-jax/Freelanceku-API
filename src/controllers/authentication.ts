@@ -37,8 +37,12 @@ export const login = async (req: Request, res: Response) => {
 		);
 
 		await user.save();
+		const url = new URL("https://freelance-api-production.up.railway.app");
+		const domain = url.hostname;
+
 		res.cookie("FREEJOB_API", user.authentication.sessionToken, {
-			domain: "localhost",
+			domain: domain,
+			// domain: "localhost",
 			path: "/",
 		});
 
