@@ -7,7 +7,7 @@ This API intentionally to support integrationd data of freelancers, and for any 
 ## Endpoint
 #### Public endpoint
 #### GET
-Get all freelancers
+Get all freelancer
 * ```bash
   /freelancers
   ```
