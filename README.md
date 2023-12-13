@@ -21,12 +21,3 @@ Value: { first_name, last_name, email, password, phone, address }
 * ```bash
   /freelancers
   ```
-#### Endpoint (authentication required)
-#### GET
-* ```bash
-  /users/all
-  ```
-#### DELETE
-* ```bash
-  /users?id={userId}
-  ```
