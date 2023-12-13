@@ -16,7 +16,7 @@ Get all users
   /users
   ```
 #### POST
-Register new freelancers <br>
+Register new freelancer <br>
 Value: { first_name, last_name, email, password, phone, address }
 * ```bash
   /freelancers
