@@ -10,12 +10,13 @@ const UserSchema = new mongoose.Schema(
 			sessionToken: { type: String, select: false },
 		},
 	},
-	{ timestamps: { createdAt: "created_at" } }
+	{ timestamps: { createdAt: "created_at", updatedAt: false } }
 );
 
 export const UserModel = mongoose.model("User", UserSchema);
 
-export const getUsers = () => UserModel.find();
+export const getUsers = (filter?: Object, sortByUsername?: any) =>
+	UserModel.find({}, filter).sort(sortByUsername);
 export const getUserByEmail = (email: string) => UserModel.findOne({ email });
 export const getUserBySession = (sessionToken: string) =>
 	UserModel.findOne({ "authentication.sessionToken": sessionToken });
