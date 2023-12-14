@@ -9,7 +9,7 @@ export const login = async (req: Request, res: Response) => {
 		const { email, password } = req.body;
 
 		if (!email || !password) {
-			return errorResponse(400, "invalid username or email: Invalid", res);
+			return errorResponse(400, "INVALID", "invalid username or email", res);
 		}
 
 		const user = await getUserByEmail(email).select(
@@ -17,17 +17,13 @@ export const login = async (req: Request, res: Response) => {
 		);
 
 		if (!user) {
-			return errorResponse(400, "user not encrypted: Invalid", res);
+			return errorResponse(403, "FORBIDDEN", "user not encrypted", res);
 		}
 
 		const expectedHash = authentication(user.authentication.salt, password);
 
 		if (user.authentication.password != expectedHash) {
-			return errorResponse(
-				403,
-				"user password doesn't match with encrypted: Forbidden",
-				res
-			);
+			return errorResponse(403, "FORBIDDEN", "password doesn't match", res);
 		}
 
 		const salt = random();
@@ -43,15 +39,13 @@ export const login = async (req: Request, res: Response) => {
 
 		res.cookie("FREEJOB_API", user.authentication.sessionToken, {
 			domain: domain,
-			// domain: "localhost",
 			path: "/",
 		});
 
-		// res.status(200).json(user).end();
-		response(200, user, "log in: success", res);
+		response(200, "SUCCESS", user, "user has successfully logged in", res);
 	} catch (error) {
 		console.log(error);
-		return errorResponse(400, "bad request: invalid", res);
+		return errorResponse(400, "ERROR", "failed to log in user", res);
 	}
 };
 
@@ -59,12 +53,17 @@ export const register = async (req: Request, res: Response) => {
 	try {
 		const { email, password, username } = req.body;
 		if (!email || !password || !username) {
-			return errorResponse(400, "bad request: invalid", res);
+			return errorResponse(
+				400,
+				"INVALID",
+				"username, password or email is missing",
+				res
+			);
 		}
 
 		const existingUser = await getUserByEmail(email);
 		if (existingUser) {
-			return errorResponse(400, "bad request: invalid", res);
+			return errorResponse(400, "INVALID", "user existed", res);
 		}
 
 		const salt = random();
@@ -77,10 +76,9 @@ export const register = async (req: Request, res: Response) => {
 			},
 		});
 
-		// return res.status(200).json(user).end();
-		response(200, user, "register new user: success", res);
+		response(200, "SUCCESS", user, "register new user", res);
 	} catch (error) {
 		console.log(error);
-		return errorResponse(400, "bad request: invalid", res);
+		return errorResponse(400, "ERROR", "failed to register new user", res);
 	}
 };

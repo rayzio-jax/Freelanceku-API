@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { get, merge } from "lodash";
-import { errorResponse } from "../response";
 
+import { errorResponse } from "../response";
 import { getUserBySession } from "../db/users";
 
 export const isAuthToDelete = async (
@@ -14,17 +14,27 @@ export const isAuthToDelete = async (
 		const currentUserId = get(req, "identity._id") as string;
 
 		if (!currentUserId) {
-			return errorResponse(403, "Current user id not exist: Forbidden", res);
+			return errorResponse(404, "NOT FOUND", "current user id not exist", res);
 		}
 
 		if (currentUserId.toString() !== id) {
-			return errorResponse(403, "Unable to delete other user: Forbidden", res);
+			return errorResponse(
+				403,
+				"FORBIDDEN",
+				"unable to delete other user",
+				res
+			);
 		}
 
 		next();
 	} catch (error) {
 		console.log(error);
-		return errorResponse(400, "Bad request: invalid", res);
+		return errorResponse(
+			400,
+			"ERROR",
+			"server error: failed to verify auth",
+			res
+		);
 	}
 };
 
@@ -36,18 +46,23 @@ export const isAuthenticated = async (
 	try {
 		const sessionToken = req.cookies["FREEJOB_API"];
 		if (!sessionToken) {
-			return errorResponse(403, "Session not authenticated: Forbidden", res);
+			return errorResponse(403, "FORBIDDEN", "session not authenticated", res);
 		}
 
 		const existingUser = await getUserBySession(sessionToken);
 		if (!existingUser) {
-			return errorResponse(403, "User not logged in: Forbidden", res);
+			return errorResponse(403, "FORBIDDEN", "user not authenticated", res);
 		}
 
 		merge(req, { identity: existingUser });
 		return next();
 	} catch (error) {
 		console.log(error);
-		return errorResponse(400, "Bad request: invalid", res);
+		return errorResponse(
+			400,
+			"ERROR",
+			"server error: failed to authenticate",
+			res
+		);
 	}
 };

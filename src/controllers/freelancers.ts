@@ -19,7 +19,8 @@ export const getAllFreelancer = async (req: Request, res: Response) => {
 		) {
 			return errorResponse(
 				400,
-				"can't sort data: 2 value were given while only 1 value is acceptable",
+				"INVALID",
+				"2 sort value were given while only 1 is acceptable",
 				res
 			);
 		} else {
@@ -36,10 +37,10 @@ export const getAllFreelancer = async (req: Request, res: Response) => {
 			}
 		}
 
-		return response(200, freelancer, "get all freelancer: success", res);
+		return response(200, "SUCCESS", freelancer, "get all freelancer", res);
 	} catch (error) {
 		console.log(error);
-		return errorResponse(400, "get all freelancers: failed", res);
+		return errorResponse(400, "ERROR", "failed to get all freelancers", res);
 	}
 };
 
@@ -54,12 +55,12 @@ export const registerFreelancer = async (req: Request, res: Response) => {
 			!phone ||
 			!country
 		) {
-			return errorResponse(400, "bad request: invalid", res);
+			return errorResponse(400, "INVALID", "there is a missing data!", res);
 		}
 
 		const existingUser = await getFreelancerByEmail(email);
 		if (existingUser) {
-			return errorResponse(400, "bad request: invalid", res);
+			return errorResponse(400, "INVALID", "user existed", res);
 		}
 
 		const salt = random();
@@ -72,9 +73,14 @@ export const registerFreelancer = async (req: Request, res: Response) => {
 			country,
 		});
 
-		response(200, freelancer, "register new user: success", res);
+		response(200, "SUCCESS", freelancer, "register new freelancer", res);
 	} catch (error) {
 		console.log(error);
-		return errorResponse(400, "bad request: invalid", res);
+		return errorResponse(
+			400,
+			"ERROR",
+			"failed to register new freelancer",
+			res
+		);
 	}
 };
