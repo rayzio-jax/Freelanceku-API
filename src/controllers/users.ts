@@ -5,7 +5,7 @@ import { deleteUserById, getUserById, getUsers } from "../db/users";
 
 export const getAllUsers = async (req: Request, res: Response) => {
 	try {
-		const users = await getUsers();
+		const users = await getUsers({}, { username: 1 });
 
 		// return res.status(200).json(users);
 		return response(200, users, "get all users: success", res);
@@ -18,14 +18,19 @@ export const getAllUsers = async (req: Request, res: Response) => {
 
 export const getUsernameAndEmail = async (req: Request, res: Response) => {
 	try {
-		const users = await getUsers();
-		const filteredQuery = users.map(({ username, email }) => ({
-			username,
-			email,
-		}));
+		const sortByUsername = req.query.sortByUsername as string;
+		let users: Object;
+
+		if (sortByUsername === "asc") {
+			users = await getUsers({ username: 1, email: 1 }, { username: -1 });
+		} else if (sortByUsername === "desc") {
+			users = await getUsers({ username: 1, email: 1 }, { username: 1 });
+		} else {
+			users = await getUsers({ username: 1, email: 1 });
+		}
 
 		// return res.status(200).json(filteredQuery);
-		return response(200, filteredQuery, "get username & email: success", res);
+		return response(200, users, "get username & email: success", res);
 	} catch (error) {
 		console.log(error);
 		return errorResponse(400, "get username & email: failed", res);
