@@ -5,7 +5,16 @@ import { deleteUserById, getUserById, getUsers } from "../db/users";
 
 export const getAllUsers = async (req: Request, res: Response) => {
 	try {
-		const users = await getUsers({}, { username: 1 });
+		const sortByUsername = req.query.sortByUsername as string;
+		let users: Object;
+
+		if (sortByUsername === "asc") {
+			users = await getUsers({});
+		} else if (sortByUsername === "desc") {
+			users = await getUsers({}, { username: -1 });
+		} else {
+			users = await getUsers({});
+		}
 
 		return response(200, "SUCCESS", users, "get all user", res);
 	} catch (error) {
@@ -20,9 +29,9 @@ export const getUsernameAndEmail = async (req: Request, res: Response) => {
 		let users: Object;
 
 		if (sortByUsername === "asc") {
-			users = await getUsers({ username: 1, email: 1 }, { username: -1 });
+			users = await getUsers({ username: 1, email: 1 });
 		} else if (sortByUsername === "desc") {
-			users = await getUsers({ username: 1, email: 1 }, { username: 1 });
+			users = await getUsers({ username: 1, email: 1 }, { username: -1 });
 		} else {
 			users = await getUsers({ username: 1, email: 1 });
 		}
