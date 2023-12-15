@@ -40,6 +40,8 @@ export const login = async (req: Request, res: Response) => {
 		res.cookie("FREEJOB_API", user.authentication.sessionToken, {
 			domain: domain,
 			path: "/",
+			expires: new Date(Date.now() + 9000000),
+			httpOnly: true,
 		});
 
 		response(200, "SUCCESS", user, "user has successfully logged in", res);
@@ -51,8 +53,8 @@ export const login = async (req: Request, res: Response) => {
 
 export const register = async (req: Request, res: Response) => {
 	try {
-		const { email, password, username } = req.body;
-		if (!email || !password || !username) {
+		const { username, email, role, password } = req.body;
+		if (!username || !email || !password) {
 			return errorResponse(
 				400,
 				"INVALID",
@@ -68,8 +70,9 @@ export const register = async (req: Request, res: Response) => {
 
 		const salt = random();
 		const user = await createUser({
-			email,
 			username,
+			email,
+			role,
 			authentication: {
 				salt,
 				password: authentication(salt, password),
