@@ -1,9 +1,5 @@
 import mongoose from "mongoose";
 
-const isValidPhoneNumber = (value: string) => {
-	return /^\d{0,12}$/.test(value);
-};
-
 const UserSchema = new mongoose.Schema(
 	{
 		first_name: { type: String, required: true, max: 50 },
@@ -21,18 +17,18 @@ const UserSchema = new mongoose.Schema(
 			type: String,
 			required: true,
 			max: 12,
-			validator: isValidPhoneNumber,
+			match: /^\d{0,12}$/,
 		},
 		country: { type: String, required: true, max: 20, lowercase: true },
 	},
 	{ timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
 );
 
-export const UserModel = mongoose.model("Freelancer", UserSchema);
+export const Freelancer = mongoose.model("Freelancer", UserSchema);
 
 export const getFreelancers = (sortByFirstname?: any, sortByEmail?: any) =>
-	UserModel.find()?.sort(sortByFirstname || sortByEmail);
+	Freelancer.find()?.sort(sortByFirstname || sortByEmail);
 export const getFreelancerByEmail = (email: string) =>
-	UserModel.findOne({ email });
+	Freelancer.findOne({ email });
 export const createFreelancer = (values: Record<string, any>) =>
-	new UserModel(values).save().then((user) => user.toObject());
+	new Freelancer(values).save().then((user) => user.toObject());
