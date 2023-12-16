@@ -29,11 +29,14 @@ export const getUsernameAndEmail = async (req: Request, res: Response) => {
 		let users: Object;
 
 		if (sortByUsername === "asc") {
-			users = await getUsers({ username: 1, email: 1 });
+			users = await getUsers({ _id: 0, username: 1, email: 1 });
 		} else if (sortByUsername === "desc") {
-			users = await getUsers({ username: 1, email: 1 }, { username: -1 });
+			users = await getUsers(
+				{ _id: 0, username: 1, email: 1 },
+				{ username: -1 }
+			);
 		} else {
-			users = await getUsers({ username: 1, email: 1 });
+			users = await getUsers({ _id: 0, username: 1, email: 1 });
 		}
 
 		return response(200, "SUCCESS", users, "get username and email", res);
