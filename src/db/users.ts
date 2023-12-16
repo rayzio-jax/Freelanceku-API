@@ -23,6 +23,11 @@ const UserSchema = new mongoose.Schema(
 			max: 10,
 			default: "r-fa00",
 		},
+		isVerified: {
+			type: Boolean,
+			default: false,
+			select: false,
+		},
 	},
 	{ timestamps: { createdAt: "created_at", updatedAt: false } }
 );
@@ -41,3 +46,9 @@ export const deleteUserById = (id: string) =>
 	User.findOneAndDelete({ _id: id });
 export const updateUserById = (id: string, values: Record<string, any>) =>
 	User.findByIdAndUpdate(id, values);
+export const updateUserByEmail = (
+	email: string,
+	values: Record<string, any>
+) => {
+	User.findOneAndUpdate({ email }, values);
+};
