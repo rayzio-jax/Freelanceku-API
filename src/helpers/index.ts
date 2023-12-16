@@ -3,6 +3,8 @@ import crypto from "crypto";
 import nodemailer from "nodemailer";
 
 const TOKEN = process.env.SECRET_ACCESS_TOKEN;
+const MAIL_USER = process.env.MAIL_USER;
+const MAIL_PASS = process.env.MAIL_PASS;
 
 export const random = () => crypto.randomBytes(128).toString("base64");
 export const authentication = (salt: string, password: string) => {
@@ -17,8 +19,8 @@ export const transporter: nodemailer.Transporter = nodemailer.createTransport({
 	port: 465,
 	secure: true,
 	auth: {
-		user: "no-reply-test@fa-api.co",
-		pass: "06525C7D5B00E1D4A18D3B9C760C4EC8FA18",
+		user: MAIL_USER,
+		pass: MAIL_PASS,
 	},
 });
 
