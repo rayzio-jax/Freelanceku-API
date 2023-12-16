@@ -37,7 +37,7 @@ export const login = async (req: Request, res: Response) => {
 		// const domain = url.hostname;
 		const domain = "localhost";
 
-		res.cookie("FREEJOB_API", user.authentication.sessionToken, {
+		res.cookie("SessionTokenId", user.authentication.sessionToken, {
 			domain: domain,
 			path: "/",
 			expires: new Date(Date.now() + 9000000),
@@ -72,11 +72,11 @@ export const register = async (req: Request, res: Response) => {
 		const user = await createUser({
 			username,
 			email,
-			role,
 			authentication: {
 				salt,
 				password: authentication(salt, password),
 			},
+			role,
 		});
 
 		response(200, "SUCCESS", user, "register new user", res);

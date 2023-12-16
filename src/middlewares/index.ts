@@ -44,7 +44,7 @@ export const isAuthenticated = async (
 	next: NextFunction
 ) => {
 	try {
-		const sessionToken = req.cookies["FREEJOB_API"];
+		const sessionToken = req.cookies["SessionTokenID"];
 		if (!sessionToken) {
 			return errorResponse(403, "FORBIDDEN", "session not authenticated", res);
 		}
