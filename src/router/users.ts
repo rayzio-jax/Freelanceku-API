@@ -9,8 +9,8 @@ import {
 import { isAuthToDelete, isAuthenticated } from "../middlewares";
 
 export default (router: Router) => {
-	router.get("/users", getUsernameAndEmail);
-	router.get("/users/all", isAuthenticated, getAllUsers);
-	router.delete("/users", isAuthenticated, isAuthToDelete, deleteUser);
-	router.patch("/users", isAuthenticated, isAuthToDelete, updateUser);
+	router.get("/v1/users", getUsernameAndEmail);
+	router.get("/v1/users/all", isAuthenticated, getAllUsers);
+	router.delete("/v1/users", isAuthenticated, isAuthToDelete, deleteUser);
+	router.patch("/v1/users", isAuthenticated, isAuthToDelete, updateUser);
 };

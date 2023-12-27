@@ -143,3 +143,5 @@ dist
 
 # Vercel dpeloyment
 .vercel
+
+*.pem

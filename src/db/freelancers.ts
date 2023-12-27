@@ -1,21 +1,33 @@
 import mongoose from "mongoose";
 
-const UserSchema = new mongoose.Schema(
+const FreelancerSchema = new mongoose.Schema(
 	{
-		first_name: { type: String, required: true },
-		last_name: { type: String, required: true },
-		email: { type: String, required: true },
-		password: { type: String, required: true, select: false },
-		phone: { type: String, required: true },
-		address: { type: String, required: true },
+		first_name: { type: String, required: true, max: 50 },
+		last_name: { type: String, required: true, max: 50 },
+		email: {
+			type: String,
+			required: true,
+			max: 30,
+			unique: true,
+			lowercase: true,
+			trim: true,
+		},
+		phone: {
+			type: String,
+			required: true,
+			max: 12,
+			match: /^\d{0,12}$/,
+		},
+		country: { type: String, required: true, max: 20, lowercase: true },
 	},
-	{ timestamps: { createdAt: "created_at", updatedAt: "udpated_at" } }
+	{ timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
 );
 
-export const UserModel = mongoose.model("Freelancer", UserSchema);
+export const Freelancer = mongoose.model("Freelancer", FreelancerSchema);
 
-export const getFreelancers = () => UserModel.find();
+export const getFreelancers = (sortByFirstname?: any, sortByEmail?: any) =>
+	Freelancer.find()?.sort(sortByFirstname || sortByEmail);
 export const getFreelancerByEmail = (email: string) =>
-	UserModel.findOne({ email });
+	Freelancer.findOne({ email });
 export const createFreelancer = (values: Record<string, any>) =>
-	new UserModel(values).save().then((user) => user.toObject());
+	new Freelancer(values).save().then((user) => user.toObject());
