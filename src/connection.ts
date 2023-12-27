@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Promise } from "mongoose";
 import "dotenv/config";
 
 const db_url = process.env.MONGODB_URI;
