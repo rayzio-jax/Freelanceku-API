@@ -17,7 +17,7 @@ const UserSchema = new mongoose.Schema(
 		},
 		authentication: {
 			key: { type: String, select: false },
-			password: { type: String, required: true, select: false },
+			password: { type: String, required: true, max: 14, select: false },
 			sessionToken: { type: String, select: false },
 		},
 		role: {
