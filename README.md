@@ -8,6 +8,9 @@ This API intentionally to support integrationd data of freelancers, and for any 
 
 ## Endpoint
 
+##### Required Header
+Authorization: YOUR_API_KEY
+
 #### Public endpoint
 
 #### GET
