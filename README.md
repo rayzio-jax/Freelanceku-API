@@ -11,38 +11,70 @@ This API intentionally to support integrationd data of freelancers, and for any 
 #### Public endpoint
 
 #### GET
-
 Get all freelancers
-
 * ```bash
-  /freelancers
+  /v1/freelancers
   ```
 
 Get all users
-
 * ```bash
-  /users
+  /v1/users
   ```
 
 #### POST
-
-Register new freelancers <br>
-Value: { first_name, last_name, email, password, phone, address }
+Register new user
 
 * ```bash
-  /freelancers
+  /v1/auth/register
   ```
+Register new freelancers
+| Value  | Type | Option |
+| --- | --- | --- |
+| username  | string  | max: 20 |
+| email  | string  | max: 30 |
+| password  | string  | max: 14 |
+| role  | string  | max: 10 |
+
+* ```bash
+  /v1/auth/login
+  ```
+Login a user
+| Value  | Type|
+| --- | --- |
+| email  | string |
+| password  | string |
+
+* ```bash
+  /v1/freelancers
+  ```
+Register new freelancers
+| Value  | Type | Option |
+| --- | --- | --- |
+| first_name  | string  | max: 30 |
+| last_name  | string  | max: 30 |
+| email  | string  | max: 30 |
+| phone  | string  | max: 12 <br> match: number |
+| country  | string  | max: 20 |
 
 #### Endpoint (authentication required)
 
 #### GET
-
+Get full information of all user
 * ```bash
-  /users/all
+  /v1/users/all
+  ```
+
+#### PATCH
+Update user value
+| Value  | Type | Option |
+| --- | --- | --- |
+| username  | string  | max: 20 |
+* ```bash
+  /v1/users?id={userId}
   ```
 
 #### DELETE
-
+Delete user by user id
 * ```bash
-  /users?id={userId}
+  /v1/users?id={userId}
   ```
