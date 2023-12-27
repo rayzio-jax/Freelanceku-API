@@ -5,52 +5,79 @@ import {
 	getFreelancers,
 	createFreelancer,
 } from "../db/freelancers";
-import { random, authentication } from "../helpers";
 
 export const getAllFreelancer = async (req: Request, res: Response) => {
 	try {
-		const freelancer = await getFreelancers();
+		const sortByFirstname = req?.query?.sortByFirstname as string;
+		const sortByEmail = req?.query?.sortByEmail as string;
+		let freelancer: Object;
 
-		return response(200, freelancer, "get all freelancer: success", res);
+		if (
+			typeof sortByEmail === "string" &&
+			typeof sortByFirstname === "string"
+		) {
+			return errorResponse(
+				400,
+				"INVALID",
+				"2 sort value were given while only 1 is acceptable",
+				res
+			);
+		} else {
+			if (sortByEmail === "asc") {
+				freelancer = await getFreelancers({ email: 1 });
+			} else if (sortByEmail === "desc") {
+				freelancer = await getFreelancers({ email: -1 });
+			} else if (sortByFirstname === "asc") {
+				freelancer = await getFreelancers({ first_name: 1 });
+			} else if (sortByFirstname === "desc") {
+				freelancer = await getFreelancers({ first_name: -1 });
+			} else {
+				freelancer = await getFreelancers();
+			}
+		}
+
+		return response(200, "SUCCESS", freelancer, "get all freelancer", res);
 	} catch (error) {
 		console.log(error);
-		return errorResponse(400, "get all freelancers: failed", res);
+		return errorResponse(400, "ERROR", "failed to get all freelancers", res);
 	}
 };
 
 export const registerFreelancer = async (req: Request, res: Response) => {
 	try {
-		const { first_name, last_name, email, password, phone, address } = req.body;
+		const { first_name, last_name, email, password, phone, country } = req.body;
 		if (
 			!first_name ||
 			!last_name ||
 			!email ||
 			!password ||
 			!phone ||
-			!address
+			!country
 		) {
-			return errorResponse(400, "bad request: invalid", res);
+			return errorResponse(400, "INVALID", "there is a missing data!", res);
 		}
 
 		const existingUser = await getFreelancerByEmail(email);
 		if (existingUser) {
-			return errorResponse(400, "bad request: invalid", res);
+			return errorResponse(400, "INVALID", "user existed", res);
 		}
 
-		const salt = random();
 		const freelancer = await createFreelancer({
 			first_name,
 			last_name,
 			email,
-			password: authentication(salt, password),
 			phone,
-			address,
+			country,
 		});
 
-		// return res.status(200).json(user).end();
-		response(200, freelancer, "register new user: success", res);
+		response(200, "SUCCESS", freelancer, "register new freelancer", res);
 	} catch (error) {
 		console.log(error);
-		return errorResponse(400, "bad request: invalid", res);
+		return errorResponse(
+			400,
+			"ERROR",
+			"failed to register new freelancer",
+			res
+		);
 	}
 };
