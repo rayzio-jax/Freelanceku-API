@@ -8,10 +8,10 @@ This API intentionally to support integrationd data of freelancers, and for any 
 
 ## Endpoint
 
-##### Required Header
-Authorization: YOUR_API_KEY
+### Required Header
+* Authorization: YOUR_API_KEY
 
-#### Public endpoint
+### Public endpoint
 
 #### GET
 Get all users
@@ -40,7 +40,7 @@ Login a user
 | email  | string |
 | password  | string |
 
-#### Endpoint (authentication required)
+### Endpoint (authentication required)
 
 #### GET
 Get all freelancers
