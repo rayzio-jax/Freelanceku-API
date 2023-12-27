@@ -14,11 +14,6 @@ Authorization: YOUR_API_KEY
 #### Public endpoint
 
 #### GET
-Get all freelancers
-* ```bash
-  /v1/freelancers
-  ```
-
 Get all users
 * ```bash
   /v1/users
@@ -26,11 +21,9 @@ Get all users
 
 #### POST
 Register new user
-
 * ```bash
   /v1/auth/register
   ```
-Register new freelancers
 | Value  | Type | Option |
 | --- | --- | --- |
 | username  | string  | max: 20 |
@@ -38,19 +31,33 @@ Register new freelancers
 | password  | string  | max: 14 |
 | role  | string  | max: 10 |
 
+Login a user
 * ```bash
   /v1/auth/login
   ```
-Login a user
 | Value  | Type|
 | --- | --- |
 | email  | string |
 | password  | string |
 
+#### Endpoint (authentication required)
+
+#### GET
+Get all freelancers
 * ```bash
   /v1/freelancers
   ```
+
+Get full information of all user
+* ```bash
+  /v1/users/all
+  ```
+
+#### POST
 Register new freelancers
+* ```bash
+  /v1/freelancers
+  ```
 | Value  | Type | Option |
 | --- | --- | --- |
 | first_name  | string  | max: 30 |
@@ -58,14 +65,6 @@ Register new freelancers
 | email  | string  | max: 30 |
 | phone  | string  | max: 12 <br> match: number |
 | country  | string  | max: 20 |
-
-#### Endpoint (authentication required)
-
-#### GET
-Get full information of all user
-* ```bash
-  /v1/users/all
-  ```
 
 #### PATCH
 Update user value
