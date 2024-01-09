@@ -52,6 +52,8 @@ export const Login = async (req: Request, res: Response) => {
 			domain = url.hostname;
 		}
 
+		const test = "ok";
+
 		let options = {
 			domain: domain,
 			path: "/",
