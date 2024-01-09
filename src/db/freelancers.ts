@@ -2,8 +2,8 @@ import mongoose from "mongoose";
 
 const FreelancerSchema = new mongoose.Schema(
 	{
-		first_name: { type: String, required: true, max: 50 },
-		last_name: { type: String, required: true, max: 50 },
+		first_name: { type: String, required: true, max: 30 },
+		last_name: { type: String, required: true, max: 30 },
 		email: {
 			type: String,
 			required: true,
