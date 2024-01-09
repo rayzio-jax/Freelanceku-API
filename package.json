@@ -6,8 +6,8 @@
 	"scripts": {
 		"dev": "nodemon",
 		"build": "tsc -p tsconfig.json",
-		"start": "node dist/index.js --omit-dev",
-		"postinstall": "npm run build"
+		"start": "node dist/index.js",
+		"postinstall": "npm run build --omit-dev"
 	},
 	"keywords": [],
 	"author": "",
