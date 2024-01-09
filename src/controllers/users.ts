@@ -19,10 +19,10 @@ export const getAllUsers = async (req: Request, res: Response) => {
 			users = await getUsers({ _id: 1, username: 1, email: 1, created_at: 1 });
 		}
 
-		return response(200, "SUCCESS", users, "get all user", res);
+		return response(200, "SUCCESS", users, "Get All User", res);
 	} catch (error) {
 		console.log(error);
-		return errorResponse(400, "ERROR", "failed to get all user", res);
+		return errorResponse(400, "ERROR", "Failed To Get All User", res);
 	}
 };
 
@@ -42,10 +42,10 @@ export const getUsernameAndEmail = async (req: Request, res: Response) => {
 			users = await getUsers({ _id: 0, username: 1, email: 1 });
 		}
 
-		return response(200, "SUCCESS", users, "get username and email", res);
+		return response(200, "SUCCESS", users, "Get All Username And Email", res);
 	} catch (error) {
 		console.log(error);
-		return errorResponse(400, "ERROR", "failed to get username and email", res);
+		return errorResponse(400, "ERROR", "Failed To Get Username And Email", res);
 	}
 };
 
@@ -55,10 +55,10 @@ export const deleteUser = async (req: Request, res: Response) => {
 
 		const deletedUser = await deleteUserById(id);
 
-		return response(200, "SUCCESS", deletedUser, "delete user", res);
+		return response(200, "SUCCESS", deletedUser, "Delete User", res);
 	} catch (error) {
 		console.log(error);
-		return errorResponse(400, "ERROR", "failed to delete user", res);
+		return errorResponse(400, "ERROR", "Failed To Delete User", res);
 	}
 };
 
@@ -68,16 +68,16 @@ export const updateUser = async (req: Request, res: Response) => {
 		const { username } = req.body;
 
 		if (!username) {
-			return errorResponse(400, "BAD REQUEST", "username is missing", res);
+			return errorResponse(400, "BAD REQUEST", "Username Is Missing", res);
 		}
 
 		const user = await getUserById(id);
 		user.username = username;
 		await user.save();
 
-		return response(200, "SUCCESS", user, "update username", res);
+		return response(200, "SUCCESS", user, "Update Username Successful", res);
 	} catch (error) {
 		console.log(error);
-		return errorResponse(400, "ERROR", "failed to update username", res);
+		return errorResponse(400, "ERROR", "Failed To Update Username", res);
 	}
 };

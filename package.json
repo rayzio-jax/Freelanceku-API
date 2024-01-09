@@ -7,7 +7,7 @@
 		"dev": "nodemon",
 		"build": "tsc -p tsconfig.json",
 		"start": "node dist/index.js",
-		"postinstall": "npm run build --omit-dev"
+		"postinstall": "npm run build"
 	},
 	"keywords": [],
 	"author": "",

@@ -40,9 +40,17 @@ export const Login = async (req: Request, res: Response) => {
 		});
 
 		await user.save();
-		// const url = new URL("https://freelance-api-production.up.railway.app");
-		// const domain = url.hostname;
-		const domain = "localhost";
+		const env = process.env.NODE_ENV as string;
+		const port = process.env.PORT;
+		let domain: string;
+
+		if (env === "production") {
+			const url = new URL("https://freelance-api-production.up.railway.app");
+			domain = url.hostname;
+		} else if (env === "development") {
+			const url = new URL(`http://localhost:${port}`);
+			domain = url.hostname;
+		}
 
 		let options = {
 			domain: domain,
@@ -95,7 +103,6 @@ export const Register = async (req: Request, res: Response) => {
 			return errorResponse(400, "INVALID", "User Existed", res);
 		}
 
-		// const salt = random();
 		await createUser({
 			username,
 			email,
