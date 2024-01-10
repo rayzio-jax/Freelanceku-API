@@ -4,6 +4,7 @@ import { Request, Response } from "express";
 import { response, errorResponse } from "../response";
 import { createUser, getUserByEmail } from "../db/users";
 import jwt from "jsonwebtoken";
+import moment from "moment";
 
 export const Login = async (req: Request, res: Response) => {
 	try {
@@ -62,11 +63,13 @@ export const Login = async (req: Request, res: Response) => {
 
 		res.cookie("SessionTokenId", user.authentication.sessionToken, options);
 
-		const savedUser = await getUserByEmail(email).select({
-			_id: 0,
-			username: 1,
-			email: 1,
-		});
+		const savedUser = {
+			username: user.username,
+			email: user.email,
+			sessionExpiredAt: moment()
+				.add(options.maxAge, "milliseconds")
+				.format("MMMM Do YYYY, h:mm:ss a"),
+		};
 
 		return response(
 			200,
