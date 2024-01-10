@@ -133,7 +133,19 @@ export const updateUser = async (req: Request, res: Response) => {
 		if (!user) {
 			return errorResponse(400, "ERROR", "Failed To Update Username", res);
 		}
-		return response(200, "SUCCESS", user, "Update Username Successful", res);
+
+		const filterResponse = {
+			username: user.username,
+			email: user.email,
+		};
+
+		return response(
+			200,
+			"SUCCESS",
+			filterResponse,
+			"Update Username Successful",
+			res
+		);
 	} catch (error) {
 		console.log(error);
 		return errorResponse(400, "ERROR", "Failed To Update Username", res);
