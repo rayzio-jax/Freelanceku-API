@@ -42,7 +42,7 @@ export const registerFreelancer = async (req: Request, res: Response) => {
 	try {
 		const { first_name, last_name, email, phone, country } = req.body;
 		if (!first_name || !last_name || !email || !phone || !country) {
-			return errorResponse(400, "INVALID", "", res);
+			return errorResponse(400, "INVALID", "Missing Input Data", res);
 		}
 
 		const existingUser = await getFreelancerByEmail(email);
