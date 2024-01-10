@@ -17,26 +17,29 @@ export const getAllUser = async (req: Request, res: Response) => {
 		} else {
 			if (sortByUsername === "asc" && sortByEmail === "asc") {
 				users = await getUsers(
-					{ _id: 0, __v: 0, created_at: 0 },
+					{ _id: 0, __v: 0, createdAt: 0, updatedAt: 0 },
 					{ username: 1, email: 1 }
 				);
 			} else if (sortByUsername === "asc" && sortByEmail === "desc") {
 				users = await getUsers(
-					{ _id: 0, __v: 0, created_at: 0 },
+					{ _id: 0, __v: 0, createdAt: 0, updatedAt: 0 },
 					{ username: 1, email: -1 }
 				);
 			} else if (sortByUsername === "desc" && sortByEmail === "asc") {
 				users = await getUsers(
-					{ _id: 0, __v: 0, created_at: 0 },
+					{ _id: 0, __v: 0, createdAt: 0, updatedAt: 0 },
 					{ username: -1, email: 1 }
 				);
 			} else if (sortByUsername === "desc" && sortByEmail === "desc") {
 				users = await getUsers(
-					{ _id: 0, __v: 0, created_at: 0 },
+					{ _id: 0, __v: 0, createdAt: 0, updatedAt: 0 },
 					{ username: -1, email: -1 }
 				);
 			} else {
-				users = await getUsers({ _id: 0, __v: 0, created_at: 0 }, {});
+				users = await getUsers(
+					{ _id: 0, __v: 0, createdAt: 0, updatedAt: 0 },
+					{}
+				);
 			}
 		}
 		return response(200, "SUCCESS", users, "Get All User", res);
@@ -65,26 +68,26 @@ export const getAllUsernameAndEmail = async (req: Request, res: Response) => {
 		} else {
 			if (sortByUsername === "asc" && sortByEmail === "asc") {
 				users = await getUsers(
-					{ _id: 0, __v: 0, username: 1, email: 1 },
+					{ _id: 0, username: 1, email: 1 },
 					{ username: 1, email: 1 }
 				);
 			} else if (sortByUsername === "asc" && sortByEmail === "desc") {
 				users = await getUsers(
-					{ _id: 0, __v: 0, username: 1, email: 1 },
+					{ _id: 0, username: 1, email: 1 },
 					{ username: 1, email: -1 }
 				);
 			} else if (sortByUsername === "desc" && sortByEmail === "asc") {
 				users = await getUsers(
-					{ _id: 0, __v: 0, username: 1, email: 1 },
+					{ _id: 0, username: 1, email: 1 },
 					{ username: -1, email: 1 }
 				);
 			} else if (sortByUsername === "desc" && sortByEmail === "desc") {
 				users = await getUsers(
-					{ _id: 0, __v: 0, username: 1, email: 1 },
+					{ _id: 0, username: 1, email: 1 },
 					{ username: -1, email: -1 }
 				);
 			} else {
-				users = await getUsers({ _id: 0, __v: 0, username: 1, email: 1 }, {});
+				users = await getUsers({ _id: 0, username: 1, email: 1 }, {});
 			}
 		}
 
@@ -101,11 +104,17 @@ export const deleteUser = async (req: Request, res: Response) => {
 
 		const deletedUser = await deleteUserByUsername(username);
 
+		const filterResponse = {
+			username: deletedUser.username,
+			email: deletedUser.email,
+			role: deletedUser.role,
+		};
+
 		return response(
 			200,
 			"SUCCESS",
-			deletedUser,
-			`Delete User Success: ${deletedUser}`,
+			filterResponse,
+			`Delete User Success: ${deletedUser.username}`,
 			res
 		);
 	} catch (error) {
