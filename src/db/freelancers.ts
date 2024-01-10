@@ -2,8 +2,8 @@ import mongoose from "mongoose";
 
 const FreelancerSchema = new mongoose.Schema(
 	{
-		first_name: { type: String, required: true, max: 30 },
-		last_name: { type: String, required: true, max: 30 },
+		first_name: { type: String, required: true, uppercase: true, max: 30 },
+		last_name: { type: String, required: true, uppercase: true, max: 30 },
 		email: {
 			type: String,
 			required: true,
@@ -15,10 +15,10 @@ const FreelancerSchema = new mongoose.Schema(
 		phone: {
 			type: String,
 			required: true,
-			max: 12,
+			max: 15,
 			match: /^\d{0,12}$/,
 		},
-		country: { type: String, required: true, max: 20, lowercase: true },
+		country: { type: String, required: true, lowercase: true, max: 20 },
 	},
 	{ timestamps: true }
 );
