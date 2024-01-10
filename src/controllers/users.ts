@@ -46,7 +46,7 @@ export const getAllUser = async (req: Request, res: Response) => {
 	}
 };
 
-export const getUsernameAndEmail = async (req: Request, res: Response) => {
+export const getAllUsernameAndEmail = async (req: Request, res: Response) => {
 	try {
 		const sortByUsername = req.query.sortByUsername as string;
 		const sortByEmail = req.query.sortByEmail as string;
