@@ -33,18 +33,7 @@ const UserSchema = new mongoose.Schema(
 			select: false,
 		},
 	},
-	{
-		timestamps: { createdAt: "created_at", updatedAt: false },
-		toJSON: {
-			transform: function (doc: any, ret: any) {
-				// Use moment to format timestamps
-				ret.localCreatedAt = moment(ret.createdAt).format(
-					"YYYY-MM-DDTHH:mm:ss"
-				);
-				return ret as JSON;
-			},
-		},
-	}
+	{ timestamps: true }
 );
 
 UserSchema.pre("save", function (next) {
@@ -80,8 +69,8 @@ UserSchema.pre("save", function (next) {
 
 export const User = mongoose.model("User", UserSchema);
 
-export const getUsers = (filter?: Object, sortByUsername?: any) =>
-	User.find({}, filter).sort(sortByUsername);
+export const getUsers = (filter?: Object, sorter?: {}) =>
+	User.find({}, filter).sort(sorter);
 export const getUserByEmail = (email: string) => User.findOne({ email });
 export const getUserBySession = (sessionToken: string) =>
 	User.findOne({ "authentication.sessionToken": sessionToken });

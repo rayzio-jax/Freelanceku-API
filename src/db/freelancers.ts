@@ -20,13 +20,13 @@ const FreelancerSchema = new mongoose.Schema(
 		},
 		country: { type: String, required: true, max: 20, lowercase: true },
 	},
-	{ timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
+	{ timestamps: true }
 );
 
 export const Freelancer = mongoose.model("Freelancer", FreelancerSchema);
 
-export const getFreelancers = (sortByFirstname?: any, sortByEmail?: any) =>
-	Freelancer.find()?.sort(sortByFirstname || sortByEmail);
+export const getFreelancers = (filter?: Object, sorter?: {}) =>
+	Freelancer.find({}, filter)?.sort(sorter);
 export const getFreelancerByEmail = (email: string) =>
 	Freelancer.findOne({ email });
 export const createFreelancer = (values: Record<string, any>) =>
