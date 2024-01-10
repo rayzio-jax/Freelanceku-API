@@ -14,8 +14,6 @@ export const isAuthToDelete = async (
 		const { username } = req.body;
 		const currentUsername = get(req, "identity.username") as string;
 
-		console.log(currentUsername);
-
 		if (!currentUsername) {
 			return errorResponse(404, "FORBIDDEN", "User Not Logged In", res);
 		}
