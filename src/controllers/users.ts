@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 
 import { response, errorResponse } from "../response";
-import { deleteUserById, getUserById, getUsers } from "../db/users";
+import { deleteUserByUsername, getUsers, updateUserByEmail } from "../db/users";
 
 export const getAllUser = async (req: Request, res: Response) => {
 	try {
@@ -97,11 +97,17 @@ export const getUsernameAndEmail = async (req: Request, res: Response) => {
 
 export const deleteUser = async (req: Request, res: Response) => {
 	try {
-		const id = req.query.id as string;
+		const { username } = req.body;
 
-		const deletedUser = await deleteUserById(id);
+		const deletedUser = await deleteUserByUsername(username);
 
-		return response(200, "SUCCESS", deletedUser, "Delete User", res);
+		return response(
+			200,
+			"SUCCESS",
+			deletedUser,
+			`Delete User Success: ${deletedUser}`,
+			res
+		);
 	} catch (error) {
 		console.log(error);
 		return errorResponse(400, "ERROR", "Failed To Delete User", res);
@@ -110,17 +116,14 @@ export const deleteUser = async (req: Request, res: Response) => {
 
 export const updateUser = async (req: Request, res: Response) => {
 	try {
-		const id = req.query.id as string;
-		const { username } = req.body;
-
-		if (!username) {
-			return errorResponse(400, "BAD REQUEST", "Username Is Missing", res);
+		const { email, new_username } = req.body;
+		if (!new_username) {
+			return errorResponse(400, "BAD REQUEST", "New Username Is Missing", res);
 		}
-
-		const user = await getUserById(id);
-		user.username = username;
-		await user.save();
-
+		const user = await updateUserByEmail(email, { username: new_username });
+		if (!user) {
+			return errorResponse(400, "ERROR", "Failed To Update Username", res);
+		}
 		return response(200, "SUCCESS", user, "Update Username Successful", res);
 	} catch (error) {
 		console.log(error);
