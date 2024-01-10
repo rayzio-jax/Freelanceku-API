@@ -103,7 +103,7 @@ export const Register = async (req: Request, res: Response) => {
 			return errorResponse(400, "INVALID", "User Existed", res);
 		}
 
-		await createUser({
+		const user = await createUser({
 			username,
 			email,
 			authentication: {
@@ -112,17 +112,13 @@ export const Register = async (req: Request, res: Response) => {
 			role,
 		});
 
-		const userResponse = getUserByEmail(email).select(
-			"-_id username email created_at"
-		);
+		const filterResponse = {
+			username: user.username,
+			email: user.email,
+			role: user.role,
+		};
 
-		return response(
-			200,
-			"SUCCESS",
-			(await userResponse).toJSON(),
-			"Register New User",
-			res
-		);
+		return response(200, "SUCCESS", filterResponse, "Register New User", res);
 	} catch (error) {
 		console.log(error);
 		return errorResponse(
