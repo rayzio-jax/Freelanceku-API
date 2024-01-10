@@ -10,28 +10,45 @@ export const getAllFreelancer = async (req: Request, res: Response) => {
 	try {
 		const sortByFirstname = req?.query?.sortByFirstname as string;
 		const sortByEmail = req?.query?.sortByEmail as string;
-		let freelancer: Object;
+		let freelancers: Object;
 
 		if (
 			(sortByFirstname !== "asc" && sortByFirstname !== "desc") ||
 			(sortByEmail !== "asc" && sortByEmail !== "desc")
 		) {
-			return errorResponse(400, "INVALID", "Sort Not Valid", res);
+			return errorResponse(
+				400,
+				"INVALID",
+				"Get All Freelancer: Sort Not Valid",
+				res
+			);
 		} else {
 			if (sortByFirstname === "asc" && sortByEmail === "asc") {
-				freelancer = await getFreelancers({ first_name: 1, email: 1 });
+				freelancers = await getFreelancers(
+					{ _id: 0, __v: 0 },
+					{ first_name: 1, email: 1 }
+				);
 			} else if (sortByFirstname === "asc" && sortByEmail === "desc") {
-				freelancer = await getFreelancers({ first_name: 1, email: -1 });
+				freelancers = await getFreelancers(
+					{ _id: 0, __v: 0 },
+					{ first_name: 1, email: -1 }
+				);
 			} else if (sortByFirstname === "desc" && sortByEmail === "asc") {
-				freelancer = await getFreelancers({ first_name: -1, email: 1 });
+				freelancers = await getFreelancers(
+					{ _id: 0, __v: 0 },
+					{ first_name: -1, email: 1 }
+				);
 			} else if (sortByFirstname === "desc" && sortByEmail === "desc") {
-				freelancer = await getFreelancers({ first_name: -1, email: -1 });
+				freelancers = await getFreelancers(
+					{ _id: 0, __v: 0 },
+					{ first_name: -1, email: -1 }
+				);
 			} else {
-				freelancer = await getFreelancers();
+				freelancers = await getFreelancers({ _id: 0, __v: 0 }, {});
 			}
 		}
 
-		return response(200, "SUCCESS", freelancer, "Get All Freelancer", res);
+		return response(200, "SUCCESS", freelancers, "Get All Freelancer", res);
 	} catch (error) {
 		console.log(error);
 		return errorResponse(400, "ERROR", "Failed To Get All Freelancer", res);
@@ -58,7 +75,15 @@ export const registerFreelancer = async (req: Request, res: Response) => {
 			country,
 		});
 
-		response(200, "SUCCESS", freelancer, "Register New Freelancer", res);
+		const filterResponse = {
+			first_name: freelancer.first_name,
+			last_name: freelancer.last_name,
+			email: freelancer.email,
+			phone: freelancer.phone,
+			country: freelancer.country,
+		};
+
+		response(200, "SUCCESS", filterResponse, "Register New Freelancer", res);
 	} catch (error) {
 		console.log(error);
 		return errorResponse(
