@@ -11,14 +11,16 @@ export const isAuthToDelete = async (
 	next: NextFunction
 ) => {
 	try {
-		const id = req.query.id as string;
-		const currentUserId = get(req, "identity._id") as string;
+		const { username } = req.body;
+		const currentUsername = get(req, "identity.username") as string;
 
-		if (!currentUserId) {
-			return errorResponse(404, "NOT FOUND", "Current User Not Exist", res);
+		console.log(currentUsername);
+
+		if (!currentUsername) {
+			return errorResponse(404, "FORBIDDEN", "User Not Logged In", res);
 		}
 
-		if (currentUserId.toString() !== id) {
+		if (currentUsername.toString() !== username) {
 			return errorResponse(
 				403,
 				"FORBIDDEN",
@@ -58,11 +60,11 @@ export const isAuthenticated = async (
 		}
 
 		const existingUser = await getUserBySession(sessionToken).select(
-			"authentication.key"
+			"username authentication.key"
 		);
 
 		if (!existingUser) {
-			return errorResponse(400, "ERROR", "User doesn't exist", res);
+			return errorResponse(400, "ERROR", "User Not Exist", res);
 		}
 
 		const PUBLIC_KEY = process.env.PUBLIC_KEY;
