@@ -119,6 +119,7 @@ export const Register = async (req: Request, res: Response) => {
 			username: user.username,
 			email: user.email,
 			role: user.role,
+			apiKey: user.authentication.key,
 		};
 
 		return response(200, "SUCCESS", filterResponse, "Register New User", res);
