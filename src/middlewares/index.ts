@@ -4,6 +4,7 @@ import { get, merge } from "lodash";
 import { errorResponse } from "../response";
 import { getUserBySession } from "../db/users";
 import { verifyToken } from "../helpers";
+import { UserLogout } from "../db/user_logout";
 
 export const DeleteAuthorize = async (
 	req: Request,
@@ -33,7 +34,7 @@ export const DeleteAuthorize = async (
 		return errorResponse(
 			400,
 			"ERROR",
-			"Server Error: Failed To Authenticate",
+			"Server error: Failed to authenticate",
 			res
 		);
 	}
@@ -49,12 +50,16 @@ export const isAuthenticated = async (
 		const apiKey = req.headers["api-key"];
 
 		if (!sessionToken) {
-			return errorResponse(
-				401,
-				"UNAUTHORIZE",
-				"Session Not Authenticated",
-				res
-			);
+			return errorResponse(401, "UNAUTHORIZE", "Session has expired", res);
+		}
+
+		const authHeader = req.headers["cookie"]; // get the session cookie from request header
+		if (!authHeader) return res.sendStatus(401); // if there is no cookie from request header, send an unauthorized response.
+		const cookie = authHeader.split("=")[1]; // If there is, split the cookie string to get the actual jwt token
+		const accessToken = cookie.split(";")[0];
+		const checkIfLoggedOut = await UserLogout.findOne({ token: accessToken });
+		if (checkIfLoggedOut) {
+			return errorResponse(401, "UNAUTHORIZE", "Session has expired", res);
 		}
 
 		const existingUser = await getUserBySession(sessionToken).select(
@@ -62,7 +67,7 @@ export const isAuthenticated = async (
 		);
 
 		if (!existingUser) {
-			return errorResponse(400, "ERROR", "User Not Exist", res);
+			return errorResponse(400, "ERROR", "User not exist", res);
 		}
 
 		const PUBLIC_KEY = process.env.PUBLIC_KEY;
@@ -72,11 +77,11 @@ export const isAuthenticated = async (
 		const userId = tokenData._id;
 
 		if (!tokenData || userId !== existingUser._id.toString()) {
-			return errorResponse(401, "UNAUTHORIZE", "Session Expired", res);
+			return errorResponse(401, "UNAUTHORIZE", "Session has expired", res);
 		}
 
 		if (!apiKey || apiKey !== existingUser.authentication.key) {
-			return errorResponse(401, "UNAUTHORIZE", `Invalid API Key`, res);
+			return errorResponse(401, "UNAUTHORIZE", `Invalid API key`, res);
 		}
 
 		merge(req, { identity: existingUser });
@@ -86,7 +91,7 @@ export const isAuthenticated = async (
 		return errorResponse(
 			400,
 			"ERROR",
-			"Server Error: Failed To Authenticate",
+			"Server error: Failed to authenticate",
 			res
 		);
 	}
