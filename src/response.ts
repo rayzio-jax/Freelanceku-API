@@ -16,7 +16,7 @@ export const response = (
 export const errorResponse = (
 	statusCode: number,
 	status: string,
-	message: string,
+	message: {},
 	res: Response
 ) => {
 	res.status(statusCode).json({
