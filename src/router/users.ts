@@ -6,11 +6,11 @@ import {
 	getAllUsernameAndEmail,
 	updateUser,
 } from "../controllers/users";
-import { isAuthToDelete, isAuthenticated } from "../middlewares";
+import { DeleteAuthorize, isAuthenticated } from "../middlewares";
 
 export default (router: Router) => {
 	router.get("/v1/users/all", getAllUsernameAndEmail);
 	router.get("/v1/users", isAuthenticated, getAllUser);
-	router.delete("/v1/users", isAuthenticated, isAuthToDelete, deleteUser);
+	router.delete("/v1/users", isAuthenticated, DeleteAuthorize, deleteUser);
 	router.patch("/v1/users", isAuthenticated, updateUser);
 };
