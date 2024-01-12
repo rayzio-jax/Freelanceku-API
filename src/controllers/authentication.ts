@@ -14,7 +14,7 @@ export const Login = async (req: Request, res: Response) => {
 		);
 
 		if (!email || !password) {
-			return errorResponse(400, "INVALID", "Invalid Username Or Email", res);
+			return errorResponse(400, "INVALID", "Invalid Email or Password", res);
 		}
 
 		if (!user) {
@@ -118,7 +118,6 @@ export const Register = async (req: Request, res: Response) => {
 		const filterResponse = {
 			username: user.username,
 			email: user.email,
-			role: user.role,
 			apiKey: user.authentication.key,
 		};
 
