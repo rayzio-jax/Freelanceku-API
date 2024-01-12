@@ -12,7 +12,7 @@ export const connectDB = () => {
 		db.on("error", (error: Error) => console.log(error));
 		db.once("open", () => {
 			console.log(
-				`📄[database]: Connected to database ${db.name} state ${db.readyState}`
+				`📄[database]: Connected to database with state ${db.readyState}`
 			);
 		});
 	} catch (error) {
