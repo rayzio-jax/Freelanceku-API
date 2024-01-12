@@ -5,7 +5,7 @@ import { errorResponse } from "../response";
 import { getUserBySession } from "../db/users";
 import { verifyToken } from "../helpers";
 
-export const isAuthToDelete = async (
+export const DeleteAuthorize = async (
 	req: Request,
 	res: Response,
 	next: NextFunction
@@ -46,7 +46,7 @@ export const isAuthenticated = async (
 ) => {
 	try {
 		const sessionToken = req.cookies["SessionTokenId"];
-		const apiKey = req.headers.authorization;
+		const apiKey = req.headers["api-key"];
 
 		if (!sessionToken) {
 			return errorResponse(
