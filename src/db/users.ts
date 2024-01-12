@@ -1,8 +1,7 @@
 import "dotenv/config";
-import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-import moment from "moment";
+import crypto from "crypto";
 
 const UserSchema = new mongoose.Schema(
 	{
@@ -23,7 +22,7 @@ const UserSchema = new mongoose.Schema(
 		},
 		authentication: {
 			key: { type: String, select: false },
-			password: { type: String, required: true, max: 14, select: false },
+			password: { type: String, required: true, min: 8, select: false },
 			sessionToken: { type: String, select: false },
 		},
 		role: {
@@ -46,24 +45,24 @@ UserSchema.pre("save", function (next) {
 	try {
 		const user = this;
 		if (!user.isNew) return next(); // If the document is not new, skip this step
-		const PRIVATE_API = process.env.PRIVATE_API_KEY;
-		const payload = {
-			username: user.username,
-			email: user.email,
-		};
 
-		user.authentication.key = jwt.sign(payload, PRIVATE_API, {
-			algorithm: "RS256",
+		const token = crypto.randomUUID();
+
+		bcrypt.genSalt(10, (err, salt) => {
+			if (err) return next(err);
+			bcrypt.hash(token, salt, function (err, hash) {
+				if (err) return next(err);
+				user.authentication.key = hash;
+			});
 		});
 
-		if (!user.isModified("authentication")) return next();
+		if (!user.isModified("authentication.password")) return next();
 		bcrypt.genSalt(10, (err, salt) => {
 			if (err) return next(err);
 
 			bcrypt.hash(user.authentication.password, salt, (err, hash) => {
 				if (err) return next(err);
 				user.authentication.password = hash;
-
 				next();
 			});
 		});
