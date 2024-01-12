@@ -5,6 +5,32 @@ import { response, errorResponse } from "../response";
 import { createUser, getUserByEmail } from "../db/users";
 import jwt from "jsonwebtoken";
 import moment from "moment";
+import { UserLogout } from "../db/user_logout";
+
+export const Logout = async (req: Request, res: Response) => {
+	try {
+		const authHeader = req.headers["cookie"];
+		if (!authHeader) return res.sendStatus(204);
+		const cookie = authHeader.split("=")[1]; // If there is, split the cookie string to get the actual jwt token
+		const accessToken = cookie.split(";")[0];
+		const checkToken = await UserLogout.findOne({ token: accessToken });
+		if (checkToken) return res.sendStatus(204);
+		const newLoggedOutUser = new UserLogout({
+			token: accessToken,
+		});
+		await newLoggedOutUser.save();
+		res.setHeader("Clear-Site-Data", '"cookies"');
+		return response(200, "SUCCESS", "", "You have been logged out!", res);
+	} catch (error) {
+		console.log(error);
+		return errorResponse(
+			400,
+			"ERROR",
+			"Failed To Log Out User: Internal Server Error",
+			res
+		);
+	}
+};
 
 export const Login = async (req: Request, res: Response) => {
 	try {
