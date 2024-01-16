@@ -5,17 +5,17 @@ import { response, errorResponse } from "../response";
 import { createUser, getUserByEmail } from "../db/users";
 import jwt from "jsonwebtoken";
 import moment from "moment";
-import { UserLogout } from "../db/user_logout";
+import { Blacklist } from "../db/blacklists";
 
 export const Logout = async (req: Request, res: Response) => {
 	try {
 		const accessToken = req.headers["cookie"];
 
 		if (!accessToken) return res.sendStatus(204);
-		const checkToken = await UserLogout.findOne({ token: accessToken });
+		const checkToken = await Blacklist.findOne({ token: accessToken });
 		if (checkToken) return res.sendStatus(204);
 
-		const newLoggedOutUser = new UserLogout({
+		const newLoggedOutUser = new Blacklist({
 			token: accessToken,
 		});
 		await newLoggedOutUser.save();

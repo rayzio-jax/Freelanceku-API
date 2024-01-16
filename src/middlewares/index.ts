@@ -4,7 +4,7 @@ import { get, merge } from "lodash";
 import { errorResponse } from "../response";
 import { getUserBySession } from "../db/users";
 import { verifyToken } from "../helpers";
-import { UserLogout } from "../db/user_logout";
+import { Blacklist } from "../db/blacklists";
 
 export const DeleteAuthorize = async (
 	req: Request,
@@ -52,7 +52,7 @@ export const isAuthenticated = async (
 		if (!accessToken)
 			return errorResponse(401, "UNAUTHORIZE", "Session not found", res); // if there is no cookie from request header, send an unauthorized response.
 
-		const checkIfLoggedOut = await UserLogout.findOne({ token: accessToken });
+		const checkIfLoggedOut = await Blacklist.findOne({ token: accessToken });
 
 		if (!accessToken || checkIfLoggedOut)
 			return errorResponse(401, "UNAUTHORIZE", "Session has expired", res);
