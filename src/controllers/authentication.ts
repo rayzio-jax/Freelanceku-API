@@ -9,12 +9,12 @@ import { UserLogout } from "../db/user_logout";
 
 export const Logout = async (req: Request, res: Response) => {
 	try {
-		const authHeader = req.headers["cookie"];
-		if (!authHeader) return res.sendStatus(204);
-		const cookie = authHeader.split("=")[1]; // If there is, split the cookie string to get the actual jwt token
-		const accessToken = cookie.split(";")[0];
+		const accessToken = req.headers["cookie"];
+
+		if (!accessToken) return res.sendStatus(204);
 		const checkToken = await UserLogout.findOne({ token: accessToken });
 		if (checkToken) return res.sendStatus(204);
+
 		const newLoggedOutUser = new UserLogout({
 			token: accessToken,
 		});
@@ -87,7 +87,7 @@ export const Login = async (req: Request, res: Response) => {
 			secure: true,
 		};
 
-		res.cookie("SessionTokenId", user.authentication.sessionToken, options);
+		res.cookie("SessionTokenID", user.authentication.sessionToken, options);
 
 		const savedUser = {
 			username: user.username,

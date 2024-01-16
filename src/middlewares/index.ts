@@ -46,43 +46,39 @@ export const isAuthenticated = async (
 	next: NextFunction
 ) => {
 	try {
-		const sessionToken = req.cookies["SessionTokenId"];
 		const apiKey = req.headers["api-key"];
+		const accessToken = req.headers["cookie"]; // get the session cookie from request header
 
-		if (!sessionToken) {
-			return errorResponse(401, "UNAUTHORIZE", "Session has expired", res);
-		}
+		if (!accessToken)
+			return errorResponse(401, "UNAUTHORIZE", "Session not found", res); // if there is no cookie from request header, send an unauthorized response.
 
-		const authHeader = req.headers["cookie"]; // get the session cookie from request header
-		if (!authHeader) return res.sendStatus(401); // if there is no cookie from request header, send an unauthorized response.
-		const cookie = authHeader.split("=")[1]; // If there is, split the cookie string to get the actual jwt token
-		const accessToken = cookie.split(";")[0];
 		const checkIfLoggedOut = await UserLogout.findOne({ token: accessToken });
-		if (checkIfLoggedOut) {
-			return errorResponse(401, "UNAUTHORIZE", "Session has expired", res);
-		}
 
-		const existingUser = await getUserBySession(sessionToken).select(
+		if (!accessToken || checkIfLoggedOut)
+			return errorResponse(401, "UNAUTHORIZE", "Session has expired", res);
+
+		const existingUser = await getUserBySession(accessToken).select(
 			"username authentication.key"
 		);
 
-		if (!existingUser) {
+		if (!existingUser)
 			return errorResponse(400, "ERROR", "User not exist", res);
-		}
 
 		const PUBLIC_KEY = process.env.PUBLIC_KEY;
-		const tokenData = verifyToken(sessionToken, PUBLIC_KEY, res) as {
+		const tokenData = verifyToken(accessToken, PUBLIC_KEY, res) as {
 			_id: string;
 		};
+
 		const userId = tokenData._id;
 
-		if (!tokenData || userId !== existingUser._id.toString()) {
+		if (!tokenData || userId !== existingUser._id.toString())
 			return errorResponse(401, "UNAUTHORIZE", "Session has expired", res);
-		}
 
-		if (!apiKey || apiKey !== existingUser.authentication.key) {
+		if (!apiKey)
+			return errorResponse(401, "UNAUTHORIZE", "API key is required", res);
+
+		if (apiKey !== existingUser.authentication.key)
 			return errorResponse(401, "UNAUTHORIZE", `Invalid API key`, res);
-		}
 
 		merge(req, { identity: existingUser });
 		next();
