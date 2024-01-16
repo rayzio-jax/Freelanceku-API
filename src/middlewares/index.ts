@@ -47,10 +47,12 @@ export const isAuthenticated = async (
 ) => {
 	try {
 		const apiKey = req.headers["api-key"];
-		const accessToken = req.headers["cookie"]; // get the session cookie from request header
+		const authHeader = req.headers["cookie"];
+		if (!authHeader)
+			return errorResponse(401, "UNAUTHORIZE", "Session not found", res);
 
-		if (!accessToken)
-			return errorResponse(401, "UNAUTHORIZE", "Session not found", res); // if there is no cookie from request header, send an unauthorized response.
+		const cookie = authHeader.split("=")[1];
+		const accessToken = cookie.split(";")[0];
 
 		const checkIfLoggedOut = await Blacklist.findOne({ token: accessToken });
 

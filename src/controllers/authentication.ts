@@ -9,7 +9,12 @@ import { Blacklist } from "../db/blacklists";
 
 export const Logout = async (req: Request, res: Response) => {
 	try {
-		const accessToken = req.headers["cookie"];
+		const authHeader = req.headers["cookie"];
+		if (!authHeader)
+			return errorResponse(401, "UNAUTHORIZE", "Session not found", res);
+
+		const cookie = authHeader.split("=")[1];
+		const accessToken = cookie.split(";")[0];
 
 		if (!accessToken) return res.sendStatus(204);
 		const checkToken = await Blacklist.findOne({ token: accessToken });
@@ -26,7 +31,7 @@ export const Logout = async (req: Request, res: Response) => {
 		return errorResponse(
 			400,
 			"ERROR",
-			"Failed To Log Out User: Internal Server Error",
+			"Failed log out user: Internal server error",
 			res
 		);
 	}
@@ -35,16 +40,17 @@ export const Logout = async (req: Request, res: Response) => {
 export const Login = async (req: Request, res: Response) => {
 	try {
 		const { email, password } = req.body;
+
+		if (!email || !password) {
+			return errorResponse(400, "INVALID", "Invalid email or password", res);
+		}
+
 		const user = await getUserByEmail(email).select(
 			"+authentication.password +authentication.key +authentication.salt"
 		);
 
-		if (!email || !password) {
-			return errorResponse(400, "INVALID", "Invalid Email or Password", res);
-		}
-
 		if (!user) {
-			return errorResponse(403, "FORBIDDEN", "User Not Exist", res);
+			return errorResponse(403, "FORBIDDEN", "User not exist", res);
 		}
 
 		const expectedHash = await bcrypt.compare(
@@ -53,7 +59,7 @@ export const Login = async (req: Request, res: Response) => {
 		);
 
 		if (!expectedHash) {
-			return errorResponse(403, "FORBIDDEN", "Password Doesn't Match", res);
+			return errorResponse(403, "FORBIDDEN", "Invalid password", res);
 		}
 
 		const payload = {
@@ -101,7 +107,7 @@ export const Login = async (req: Request, res: Response) => {
 			200,
 			"SUCCESS",
 			savedUser,
-			"User has Successfully Logged In",
+			"User has successfully logged in",
 			res
 		);
 	} catch (error) {
@@ -109,7 +115,7 @@ export const Login = async (req: Request, res: Response) => {
 		return errorResponse(
 			400,
 			"ERROR",
-			"Failed To Log In User: Internal Server Error",
+			"Failed log in user: Internal server error",
 			res
 		);
 	}
@@ -122,14 +128,14 @@ export const Register = async (req: Request, res: Response) => {
 			return errorResponse(
 				400,
 				"INVALID",
-				"Username, Password or Email is Missing",
+				"Username, password or email is missing",
 				res
 			);
 		}
 
 		const existingUser = await getUserByEmail(email);
 		if (existingUser) {
-			return errorResponse(400, "INVALID", "User Existed", res);
+			return errorResponse(400, "INVALID", "User existed", res);
 		}
 
 		const user = await createUser({
@@ -147,13 +153,13 @@ export const Register = async (req: Request, res: Response) => {
 			apiKey: user.authentication.key,
 		};
 
-		return response(200, "SUCCESS", filterResponse, "Register New User", res);
+		return response(200, "SUCCESS", filterResponse, "Register new user", res);
 	} catch (error) {
 		console.log(error);
 		return errorResponse(
 			400,
 			"ERROR",
-			`Failed To Register User: Internal Server Error`,
+			`Failed register user: Internal server error`,
 			res
 		);
 	}
