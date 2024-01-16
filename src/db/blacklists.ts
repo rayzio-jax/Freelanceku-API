@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-const UserLogoutSchema = new mongoose.Schema(
+const BlackListSchema = new mongoose.Schema(
 	{
 		token: {
 			type: String,
@@ -9,4 +9,4 @@ const UserLogoutSchema = new mongoose.Schema(
 	},
 	{ timestamps: true }
 );
-export const UserLogout = mongoose.model("UserLogout", UserLogoutSchema);
+export const Blacklist = mongoose.model("Blacklist", BlackListSchema);
