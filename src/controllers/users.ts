@@ -1,51 +1,66 @@
 import { Request, Response } from "express";
-
+import { get } from "lodash";
 import { response, errorResponse } from "../response";
-import { deleteUserByUsername, getUsers, updateUserByEmail } from "../db/users";
+import {
+	deleteUserByUsername,
+	getUserById,
+	getUsers,
+	updateUserByEmail,
+} from "../db/users";
+
+export const getCurrentUser = async (req: Request, res: Response) => {
+	try {
+		const userId = get(req, "identity._id");
+		if (!userId)
+			return errorResponse(404, "NOT FOUND", "User id not exist", res);
+
+		const currentUser = await getUserById(userId);
+
+		if (!currentUser)
+			return errorResponse(404, "NOT FOUND", "User not found", res);
+
+		return response(
+			200,
+			"SUCCESS",
+			currentUser,
+			"Get current logged in user",
+			res
+		);
+	} catch (error) {
+		console.log(error);
+		return errorResponse(400, "ERROR", "Failed to get all user", res);
+	}
+};
 
 export const getAllUser = async (req: Request, res: Response) => {
 	try {
-		const sortByUsername = req.query.sortByUsername as string;
-		const sortByEmail = req.query.sortByEmail as string;
+		const sortByUsername = (req.query?.sortByUsername ?? "asc") as string;
+		const sortByEmail = (req.query?.sortByEmail ?? "asc") as string;
 		let users: Object;
 
 		if (
 			(sortByUsername !== "asc" && sortByUsername !== "desc") ||
 			(sortByEmail !== "asc" && sortByEmail !== "desc")
 		) {
-			return errorResponse(400, "INVALID", "Get All User: Sort Not Valid", res);
+			users = await getUsers(
+				{ _id: 0, __v: 0, createdAt: 0, updatedAt: 0 },
+				{}
+			);
 		} else {
-			if (sortByUsername === "asc" && sortByEmail === "asc") {
-				users = await getUsers(
-					{ _id: 0, __v: 0, createdAt: 0, updatedAt: 0 },
-					{ username: 1, email: 1 }
-				);
-			} else if (sortByUsername === "asc" && sortByEmail === "desc") {
-				users = await getUsers(
-					{ _id: 0, __v: 0, createdAt: 0, updatedAt: 0 },
-					{ username: 1, email: -1 }
-				);
-			} else if (sortByUsername === "desc" && sortByEmail === "asc") {
-				users = await getUsers(
-					{ _id: 0, __v: 0, createdAt: 0, updatedAt: 0 },
-					{ username: -1, email: 1 }
-				);
-			} else if (sortByUsername === "desc" && sortByEmail === "desc") {
-				users = await getUsers(
-					{ _id: 0, __v: 0, createdAt: 0, updatedAt: 0 },
-					{ username: -1, email: -1 }
-				);
-			} else {
-				users = await getUsers(
-					{ _id: 0, __v: 0, createdAt: 0, updatedAt: 0 },
-					{}
-				);
-			}
+			let username;
+			let email;
+			sortByUsername === "asc" ? (username = 1) : (username = -1);
+			sortByEmail === "asc" ? (email = 1) : (email = -1);
+
+			users = await getUsers(
+				{ _id: 0, __v: 0, createdAt: 0, updatedAt: 0 },
+				{ username, email }
+			);
 		}
-		return response(200, "SUCCESS", users, "Get All User", res);
+		return response(200, "SUCCESS", users, "Get all user", res);
 	} catch (error) {
 		console.log(error);
-		return errorResponse(400, "ERROR", "Failed To Get All User", res);
+		return errorResponse(400, "ERROR", "Failed to get all user", res);
 	}
 };
 
