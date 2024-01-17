@@ -12,6 +12,7 @@ export default (router: Router) => {
 			.withMessage("Username is required")
 			.isLength({ max: 20 })
 			.withMessage("Username max chars is 20")
+			.toLowerCase()
 			.trim()
 			.escape(),
 		body("email")
@@ -24,7 +25,9 @@ export default (router: Router) => {
 			.notEmpty()
 			.withMessage("Password is required")
 			.isLength({ min: 8 })
-			.withMessage("Password atleast 8 chars long"),
+			.withMessage("Password atleast 8 chars long")
+			.isStrongPassword()
+			.withMessage("Password is weak"),
 		Validate,
 		Register
 	);
