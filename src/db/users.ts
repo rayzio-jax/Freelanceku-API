@@ -77,7 +77,7 @@ export const User = mongoose.model("User", UserSchema);
 export const getUsers = (filter?: Object, sorter?: {}) =>
 	User.find({}, filter).sort(sorter);
 
-export const getUserById = (id: string) => User.findOne({ id });
+export const getUserById = (_id: string) => User.findOne({ _id });
 
 export const getUserByEmail = (email: string) => User.findOne({ email });
 
@@ -90,12 +90,11 @@ export const getUserBySession = (sessionToken: string) =>
 export const createUser = (values: Record<string, any>) =>
 	new User(values).save().then((user) => user.toObject());
 
-export const deleteUserByUsername = (username: string) =>
-	User.findOneAndDelete({ username: username });
+export const deleteUserById = (_id: string) => User.findOneAndDelete({ _id });
 
-export const updateUserByEmail = async (
-	email: string,
+export const updateUserById = async (
+	_id: string,
 	values: Record<string, any>
 ) => {
-	return await User.findOneAndUpdate({ email }, values, { new: true });
+	return await User.findOneAndUpdate({ _id }, values, { new: true });
 };

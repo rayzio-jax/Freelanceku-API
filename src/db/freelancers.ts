@@ -1,13 +1,57 @@
 import mongoose from "mongoose";
+import _ from "lodash";
+
+function generateID(): string {
+	let id = _.times(16, () => ((Math.random() * 0xf) << 0).toString(24)).join(
+		""
+	);
+	return id;
+}
+
+const TransactionSchema = new mongoose.Schema(
+	{
+		_id: { type: String, required: true, default: generateID },
+		sender_id: {
+			type: mongoose.SchemaTypes.ObjectId,
+			required: true,
+			ref: "freelancers",
+		},
+		receiver_id: {
+			type: mongoose.SchemaTypes.ObjectId,
+			required: true,
+			ref: "freelancers",
+		},
+		amount: { type: Number, max: 10, required: true },
+		message: { type: String, max: 100, lowercase: true, required: true },
+	},
+	{
+		timestamps: { updatedAt: false },
+	}
+);
+
+export const Transaction = mongoose.model("transactions", TransactionSchema);
+
+export const getTransactions = (sorter?: {}) =>
+	Transaction.find({}, { __v: 0, createdAt: 0 })?.sort(sorter);
+
+export const createTransaction = async (values: Record<string, any>) =>
+	await new Transaction(values).save().then((data) => data.toObject());
 
 const FreelancerSchema = new mongoose.Schema(
 	{
-		first_name: { type: String, required: true, uppercase: true, max: 30 },
-		last_name: { type: String, required: true, uppercase: true, max: 30 },
-		email: {
+		first_name: { type: String, max: 30, required: true, capitalize: true },
+		last_name: { type: String, max: 30, required: true, capitalize: true },
+		username: {
 			type: String,
 			required: true,
+			lowercase: true,
+			trim: true,
+			max: 20,
+		},
+		email: {
+			type: String,
 			max: 30,
+			required: true,
 			unique: true,
 			lowercase: true,
 			trim: true,
@@ -18,7 +62,11 @@ const FreelancerSchema = new mongoose.Schema(
 			max: 15,
 			match: /^\d{0,12}$/,
 		},
+		address: { type: String, required: true, lowercase: true, max: 100 },
+		province: { type: String, required: true, lowercase: true, max: 50 },
 		country: { type: String, required: true, lowercase: true, max: 20 },
+		description: { type: String, required: true, lowercase: true, max: 1000 },
+		transaction: { type: [TransactionSchema], required: false },
 	},
 	{ timestamps: true }
 );
@@ -27,7 +75,9 @@ export const Freelancer = mongoose.model("Freelancer", FreelancerSchema);
 
 export const getFreelancers = (filter?: Object, sorter?: {}) =>
 	Freelancer.find({}, filter)?.sort(sorter);
+
 export const getFreelancerByEmail = (email: string) =>
 	Freelancer.findOne({ email });
-export const createFreelancer = (values: Record<string, any>) =>
-	new Freelancer(values).save().then((user) => user.toObject());
+
+export const createFreelancer = async (values: Record<string, any>) =>
+	await new Freelancer(values).save().then((user) => user.toObject());
