@@ -16,16 +16,11 @@ export const DeleteAuthorize = async (
 		const currentUsername = get(req, "identity.username") as string;
 
 		if (!currentUsername) {
-			return errorResponse(404, "FORBIDDEN", "User Not Logged In", res);
+			return errorResponse(401, "UNAUTHORIZE", "User not authorized", res);
 		}
 
 		if (currentUsername.toString() !== username) {
-			return errorResponse(
-				403,
-				"FORBIDDEN",
-				"Unable To Delete Other User",
-				res
-			);
+			return errorResponse(401, "UNAUTHORIZE", "Invalid user identity", res);
 		}
 
 		next();
@@ -60,7 +55,7 @@ export const isAuthenticated = async (
 			return errorResponse(401, "UNAUTHORIZE", "Session has expired", res);
 
 		const existingUser = await getUserBySession(accessToken).select(
-			"username authentication.key"
+			"_id username authentication.key"
 		);
 
 		if (!existingUser)
