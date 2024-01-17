@@ -90,11 +90,11 @@ export const getUserBySession = (sessionToken: string) =>
 export const createUser = (values: Record<string, any>) =>
 	new User(values).save().then((user) => user.toObject());
 
-export const deleteUserById = (_id: string) => User.findOneAndDelete({ _id });
+export const deleteUserById = (_id: string) => User.findByIdAndDelete({ _id });
 
 export const updateUserById = async (
 	_id: string,
 	values: Record<string, any>
 ) => {
-	return await User.findOneAndUpdate({ _id }, values, { new: true });
+	return await User.findByIdAndUpdate({ _id }, values, { new: true });
 };
