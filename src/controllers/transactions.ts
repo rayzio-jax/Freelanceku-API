@@ -40,7 +40,22 @@ export const inputFreelanceTransaction = async (
 			return errorResponse(400, "ERROR", "Message is required", res);
 
 		const sender = getFreelancerByEmail(sender_email);
+		if (!sender)
+			return errorResponse(
+				404,
+				"NOT FOUND",
+				"Sender credentials not found",
+				res
+			);
+
 		const receiver = getFreelancerByEmail(receiver_email);
+		if (!receiver)
+			return errorResponse(
+				404,
+				"NOT FOUND",
+				"Receiver credentials not found",
+				res
+			);
 
 		const transaction = await createTransaction({
 			sender_id: (await sender)._id,
