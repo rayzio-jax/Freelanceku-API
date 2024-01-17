@@ -62,9 +62,11 @@ const FreelancerSchema = new mongoose.Schema(
 			max: 15,
 			match: /^\d{0,12}$/,
 		},
-		address: { type: String, required: true, lowercase: true, max: 100 },
-		province: { type: String, required: true, lowercase: true, max: 50 },
-		country: { type: String, required: true, lowercase: true, max: 20 },
+		local_address: {
+			address: { type: String, required: true, lowercase: true, max: 100 },
+			province: { type: String, required: true, lowercase: true, max: 50 },
+			country: { type: String, required: true, lowercase: true, max: 20 },
+		},
 		description: { type: String, required: true, lowercase: true, max: 1000 },
 		transaction: { type: [TransactionSchema], required: false },
 	},
@@ -79,5 +81,15 @@ export const getFreelancers = (filter?: Object, sorter?: {}) =>
 export const getFreelancerByEmail = (email: string) =>
 	Freelancer.findOne({ email });
 
+export const getFreelancerByUsername = (username: string) =>
+	Freelancer.findOne({ username });
+
 export const createFreelancer = async (values: Record<string, any>) =>
 	await new Freelancer(values).save().then((user) => user.toObject());
+
+export const updateFreelancerByEmail = async (
+	email: string,
+	values: Record<string, any>
+) => {
+	return await Freelancer.findOneAndUpdate({ email }, values, { new: true });
+};
