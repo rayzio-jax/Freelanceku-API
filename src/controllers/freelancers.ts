@@ -16,81 +16,93 @@ export const getAllFreelancer = async (req: Request, res: Response) => {
 			(sortByFirstname !== "asc" && sortByFirstname !== "desc") ||
 			(sortByEmail !== "asc" && sortByEmail !== "desc")
 		) {
-			return errorResponse(
-				400,
-				"INVALID",
-				"Get All Freelancer: Sort Not Valid",
-				res
-			);
+			freelancers = await getFreelancers({ _id: 0, __v: 0 }, {});
 		} else {
-			if (sortByFirstname === "asc" && sortByEmail === "asc") {
-				freelancers = await getFreelancers(
-					{ _id: 0, __v: 0 },
-					{ first_name: 1, email: 1 }
-				);
-			} else if (sortByFirstname === "asc" && sortByEmail === "desc") {
-				freelancers = await getFreelancers(
-					{ _id: 0, __v: 0 },
-					{ first_name: 1, email: -1 }
-				);
-			} else if (sortByFirstname === "desc" && sortByEmail === "asc") {
-				freelancers = await getFreelancers(
-					{ _id: 0, __v: 0 },
-					{ first_name: -1, email: 1 }
-				);
-			} else if (sortByFirstname === "desc" && sortByEmail === "desc") {
-				freelancers = await getFreelancers(
-					{ _id: 0, __v: 0 },
-					{ first_name: -1, email: -1 }
-				);
-			} else {
-				freelancers = await getFreelancers({ _id: 0, __v: 0 }, {});
-			}
+			let first_name;
+			let email;
+			sortByFirstname === "asc" ? (first_name = 1) : (first_name = -1);
+			sortByEmail === "asc" ? (email = 1) : (email = -1);
+
+			freelancers = await getFreelancers(
+				{ _id: 0, __v: 0 },
+				{ first_name, email }
+			);
 		}
 
-		return response(200, "SUCCESS", freelancers, "Get All Freelancer", res);
+		return response(200, "SUCCESS", freelancers, "Get all freelancer", res);
 	} catch (error) {
 		console.log(error);
-		return errorResponse(400, "ERROR", "Failed To Get All Freelancer", res);
+		return errorResponse(400, "ERROR", "Failed get all freelancer", res);
 	}
 };
 
 export const registerFreelancer = async (req: Request, res: Response) => {
 	try {
-		const { first_name, last_name, email, phone, country } = req.body;
-		if (!first_name || !last_name || !email || !phone || !country) {
-			return errorResponse(400, "INVALID", "Missing Input Data", res);
+		const {
+			first_name,
+			last_name,
+			username,
+			email,
+			phone,
+			address,
+			province,
+			country,
+			description,
+		} = req.body;
+		if (
+			!first_name ||
+			!last_name ||
+			!username ||
+			!email ||
+			!phone ||
+			!address ||
+			!province ||
+			!country
+		) {
+			return errorResponse(400, "INVALID", "Some input data is missing", res);
 		}
+
+		if (!description)
+			return errorResponse(400, "INVALID", "Freelancer bio is required", res);
 
 		const existingUser = await getFreelancerByEmail(email);
 		if (existingUser) {
-			return errorResponse(400, "INVALID", "User Existed", res);
+			return errorResponse(400, "INVALID", "User existed", res);
 		}
 
 		const freelancer = await createFreelancer({
 			first_name,
 			last_name,
+			username,
 			email,
 			phone,
+			address,
+			province,
 			country,
+			description,
 		});
 
 		const filterResponse = {
 			first_name: freelancer.first_name,
 			last_name: freelancer.last_name,
+			username: freelancer.username,
 			email: freelancer.email,
 			phone: freelancer.phone,
+			address: freelancer.address,
+			province: freelancer.province,
 			country: freelancer.country,
+			description: freelancer.description,
 		};
 
-		response(200, "SUCCESS", filterResponse, "Register New Freelancer", res);
-	} catch (error) {
-		console.log(error);
-		return errorResponse(
-			400,
-			"ERROR",
-			"Failed To Register New Freelancer",
+		return response(
+			200,
+			"SUCCESS",
+			filterResponse,
+			"Register new freelancer",
 			res
 		);
+	} catch (error) {
+		console.log(error);
+		return errorResponse(400, "ERROR", "Failed register new freelancer", res);
 	}
 };
