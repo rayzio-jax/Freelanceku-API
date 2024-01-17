@@ -62,7 +62,7 @@ export const getAllUser = async (req: Request, res: Response) => {
 		return response(200, "SUCCESS", users, "Get all user", res);
 	} catch (error) {
 		console.log(error);
-		return errorResponse(400, "ERROR", "Failed to get all user", res);
+		return errorResponse(400, "ERROR", "Failed get all user", res);
 	}
 };
 
@@ -89,10 +89,10 @@ export const getAllUsernameAndEmail = async (req: Request, res: Response) => {
 			);
 		}
 
-		return response(200, "SUCCESS", users, "Get All Username And Email", res);
+		return response(200, "SUCCESS", users, "Get all username and email", res);
 	} catch (error) {
 		console.log(error);
-		return errorResponse(400, "ERROR", "Failed To Get Username And Email", res);
+		return errorResponse(400, "ERROR", "Failed get username and email", res);
 	}
 };
 
@@ -118,12 +118,12 @@ export const deleteCurrentUser = async (req: Request, res: Response) => {
 			200,
 			"SUCCESS",
 			filterResponse,
-			`Delete User Success: ${deletedUser.username}`,
+			`Delete user success: ${deletedUser.username}`,
 			res
 		);
 	} catch (error) {
 		console.log(error);
-		return errorResponse(400, "ERROR", "Failed To Delete User", res);
+		return errorResponse(400, "ERROR", "Failed deleting user", res);
 	}
 };
 
@@ -137,7 +137,7 @@ export const updateCurrentUser = async (req: Request, res: Response) => {
 			return errorResponse(401, "UNAUTHORIZE", "Invalid user identity", res);
 
 		if (!new_username) {
-			return errorResponse(400, "BAD REQUEST", "New Username Is Missing", res);
+			return errorResponse(400, "BAD REQUEST", "New username is missing", res);
 		}
 
 		const identityID = get(req, "identity._id");
@@ -147,7 +147,7 @@ export const updateCurrentUser = async (req: Request, res: Response) => {
 			username: new_username,
 		});
 		if (!user) {
-			return errorResponse(400, "ERROR", "Failed To Update Username", res);
+			return errorResponse(400, "ERROR", "Failed updating username", res);
 		}
 
 		const filterResponse = {
@@ -159,11 +159,11 @@ export const updateCurrentUser = async (req: Request, res: Response) => {
 			200,
 			"SUCCESS",
 			filterResponse,
-			"Update Username Successful",
+			"Update username successful",
 			res
 		);
 	} catch (error) {
 		console.log(error);
-		return errorResponse(400, "ERROR", "Failed To Update Username", res);
+		return errorResponse(400, "ERROR", "Failed updating username", res);
 	}
 };
