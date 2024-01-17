@@ -2,19 +2,21 @@ import { Request, Response } from "express";
 import { get } from "lodash";
 import { response, errorResponse } from "../response";
 import {
-	deleteUserByUsername,
+	deleteUserById,
 	getUserById,
 	getUsers,
-	updateUserByEmail,
+	updateUserById,
 } from "../db/users";
 
 export const getCurrentUser = async (req: Request, res: Response) => {
 	try {
-		const userId = get(req, "identity._id");
-		if (!userId)
-			return errorResponse(404, "NOT FOUND", "User id not exist", res);
+		const { username } = req.params;
+		const userIdentity = get(req, "identity.username");
+		if (username !== userIdentity)
+			return errorResponse(401, "UNAUTHORIZE", "Invalid user identity", res);
 
-		const currentUser = await getUserById(userId);
+		const identityID = get(req, "identity._id");
+		const currentUser = await getUserById(identityID);
 
 		if (!currentUser)
 			return errorResponse(404, "NOT FOUND", "User not found", res);
@@ -74,36 +76,17 @@ export const getAllUsernameAndEmail = async (req: Request, res: Response) => {
 			(sortByUsername !== "asc" && sortByUsername !== "desc") ||
 			(sortByEmail !== "asc" && sortByEmail !== "desc")
 		) {
-			return errorResponse(
-				400,
-				"INVALID",
-				"Get All User (Unauth): Sort Not Valid",
-				res
-			);
+			users = await getUsers({ _id: 0, username: 1, email: 1 }, {});
 		} else {
-			if (sortByUsername === "asc" && sortByEmail === "asc") {
-				users = await getUsers(
-					{ _id: 0, username: 1, email: 1 },
-					{ username: 1, email: 1 }
-				);
-			} else if (sortByUsername === "asc" && sortByEmail === "desc") {
-				users = await getUsers(
-					{ _id: 0, username: 1, email: 1 },
-					{ username: 1, email: -1 }
-				);
-			} else if (sortByUsername === "desc" && sortByEmail === "asc") {
-				users = await getUsers(
-					{ _id: 0, username: 1, email: 1 },
-					{ username: -1, email: 1 }
-				);
-			} else if (sortByUsername === "desc" && sortByEmail === "desc") {
-				users = await getUsers(
-					{ _id: 0, username: 1, email: 1 },
-					{ username: -1, email: -1 }
-				);
-			} else {
-				users = await getUsers({ _id: 0, username: 1, email: 1 }, {});
-			}
+			let username;
+			let email;
+			sortByUsername === "asc" ? (username = 1) : (username = -1);
+			sortByEmail === "asc" ? (email = 1) : (email = -1);
+
+			users = await getUsers(
+				{ _id: 0, username: 1, email: 1 },
+				{ username, email }
+			);
 		}
 
 		return response(200, "SUCCESS", users, "Get All Username And Email", res);
@@ -113,11 +96,17 @@ export const getAllUsernameAndEmail = async (req: Request, res: Response) => {
 	}
 };
 
-export const deleteUser = async (req: Request, res: Response) => {
+export const deleteCurrentUser = async (req: Request, res: Response) => {
 	try {
-		const { username } = req.body;
+		const { username } = req.params;
+		const userIdentity = get(req, "identity.username");
+		if (username !== userIdentity)
+			return errorResponse(401, "UNAUTHORIZE", "Invalid user identity", res);
 
-		const deletedUser = await deleteUserByUsername(username);
+		const identityID = get(req, "identity._id");
+		const currentUser = await getUserById(identityID);
+
+		const deletedUser = await deleteUserById(currentUser._id.toString());
 
 		const filterResponse = {
 			username: deletedUser.username,
@@ -138,13 +127,25 @@ export const deleteUser = async (req: Request, res: Response) => {
 	}
 };
 
-export const updateUser = async (req: Request, res: Response) => {
+export const updateCurrentUser = async (req: Request, res: Response) => {
 	try {
-		const { email, new_username } = req.body;
+		const { username } = req.params;
+		const { new_username } = req.body;
+		const userIdentity = get(req, "identity.username");
+
+		if (username !== userIdentity)
+			return errorResponse(401, "UNAUTHORIZE", "Invalid user identity", res);
+
 		if (!new_username) {
 			return errorResponse(400, "BAD REQUEST", "New Username Is Missing", res);
 		}
-		const user = await updateUserByEmail(email, { username: new_username });
+
+		const identityID = get(req, "identity._id");
+		const currentUser = await getUserById(identityID);
+
+		const user = await updateUserById(currentUser._id.toString(), {
+			username: new_username,
+		});
 		if (!user) {
 			return errorResponse(400, "ERROR", "Failed To Update Username", res);
 		}
