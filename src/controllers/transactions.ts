@@ -29,7 +29,14 @@ export const getAllTransaction = async (req: Request, res: Response) => {
 
 export const createNewTransaction = async (req: Request, res: Response) => {
 	try {
-		const { sender_email, receiver_email, amount, message } = req.body;
+		const {
+			sender_email,
+			receiver_email,
+			payment_id,
+			amount,
+			message,
+			status,
+		} = req.body;
 
 		if (!amount)
 			return errorResponse(400, "ERROR", "No amount on transaction", res);
@@ -38,27 +45,22 @@ export const createNewTransaction = async (req: Request, res: Response) => {
 
 		const sender = getFreelancerByEmail(sender_email);
 		if (!sender)
-			return errorResponse(
-				404,
-				"NOT FOUND",
-				"Sender credentials not found",
-				res
-			);
+			return errorResponse(400, "ERROR", "Sender credentials not exist", res);
 
 		const receiver = getFreelancerByEmail(receiver_email);
 		if (!receiver)
-			return errorResponse(
-				404,
-				"NOT FOUND",
-				"Receiver credentials not found",
-				res
-			);
+			return errorResponse(400, "ERROR", "Receiver credentials not exist", res);
+
+		if (!payment_id)
+			return errorResponse(400, "ERROR", "Payment credentials not exist", res);
 
 		const transaction = await createTransaction({
 			sender_id: (await sender)._id,
 			receiver_id: (await receiver)._id,
+			payment_id,
 			amount,
 			message,
+			status,
 		});
 
 		return response(
