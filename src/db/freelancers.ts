@@ -21,8 +21,15 @@ const TransactionSchema = new mongoose.Schema(
 			required: true,
 			ref: "freelancers",
 		},
+		payment_id: { type: String, required: false },
 		amount: { type: Number, max: 10, required: true },
 		message: { type: String, max: 100, lowercase: true, required: true },
+		status: {
+			type: String,
+			enum: ["unprocessed", "failed", "pending", "finish"],
+			required: true,
+			default: "unprocessed",
+		},
 	},
 	{
 		timestamps: { updatedAt: false },
