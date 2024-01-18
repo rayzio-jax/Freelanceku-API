@@ -27,10 +27,7 @@ export const getAllTransaction = async (req: Request, res: Response) => {
 	}
 };
 
-export const inputFreelanceTransaction = async (
-	req: Request,
-	res: Response
-) => {
+export const createNewTransaction = async (req: Request, res: Response) => {
 	try {
 		const { sender_email, receiver_email, amount, message } = req.body;
 

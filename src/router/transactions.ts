@@ -2,7 +2,7 @@ import { Router } from "express";
 
 import {
 	getAllTransaction,
-	inputFreelanceTransaction,
+	createNewTransaction,
 } from "../controllers/transactions";
 import Validate from "../middlewares/validate";
 import { isAuthenticated } from "../middlewares";
@@ -34,6 +34,6 @@ export default (router: Router) => {
 			.escape(),
 		Validate,
 		isAuthenticated,
-		inputFreelanceTransaction
+		createNewTransaction
 	);
 };
