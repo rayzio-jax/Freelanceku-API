@@ -16,10 +16,10 @@ This API intentionally to support integrationd data of freelancers, and for any 
 
 #### GET
 
-Get all users
+Get all user as a public
 
 * ```bash
-  /v1/user/all
+  /v1/user/public
   ```
 
 #### POST
@@ -29,7 +29,7 @@ Register new user
 * ```bash
   /v1/auth/register
   ```
-
+Body
 | Value    | Type   | Option  |
 | -------- | ------ | ------- |
 | username | string | max: 20 |
@@ -42,7 +42,7 @@ Login a user
 * ```bash
   /v1/auth/login
   ```
-
+Body
 | Value    | Type   |
 | -------- | ------ |
 | email    | string |
@@ -52,10 +52,10 @@ Login a user
 
 #### GET
 
-Get all freelancers
+Get all freelancer
 
 * ```bash
-  /v1/freelancerr
+  /v1/freelancer
   ```
 
 Get full information of all user
@@ -64,38 +64,81 @@ Get full information of all user
   /v1/user
   ```
 
-#### POST
-
-Register new freelancers
+Get all transaction log
 
 * ```bash
-  /v1/freelancers
+  /v1/transaction
   ```
 
-| Value      | Type   | Option                        |
-| ---------- | ------ | ----------------------------- |
-| first_name | string | max: 30                       |
-| last_name  | string | max: 30                       |
-| email      | string | max: 30                       |
-| phone      | string | max: 12`<br>` match: number |
-| country    | string | max: 20                       |
+#### POST
+
+Register new freelancer
+
+* ```bash
+  /v1/freelancer/new
+  ```
+Body
+| Value       | Type   | Option                     |
+| ----------- | ------ | -------------------------- |
+| first_name  | string | max: 30                    |
+| last_name   | string | max: 30                    |
+| username    | string | max: 20                    |
+| email       | string | max: 30                    |
+| phone       | string | max: 12<br />match: number |
+| address     | string | max 100                    |
+| province    | string | max: 50                    |
+| country     | string | max: 20                    |
+| description | string | max: 1000                  |
+
+Create new transaction log
+
+* ```bash
+  /v1/transaction/new
+  ```
+Body
+| Value          | Type   | Option   |
+| -------------- | ------ | -------- |
+| sender_email   | string |          |
+| receiver_email | string |          |
+| amount         | number | max: 10  |
+| message        | string | max: 100 |
 
 #### PATCH
 
-Update user value
-
-| Value    | Type   | Option  |
-| -------- | ------ | ------- |
-| username | string | max: 20 |
+Update user by username
 
 * ```bash
-  /v1/users?id={userId}
+  /v1/user/:username
   ```
+
+Body
+| Value        | Type   | Option  |
+| ------------ | ------ | ------- |
+| new_username | string | max: 20 |
+
+Update freelancer by username
+
+* ```bash
+  /v1/freelancer/:username
+  ```
+
+Body
+| Value           | Type   | Option                     |
+| --------------- | ------ | -------------------------- |
+| new_first_name  | string | max: 30                    |
+| new_last_name   | string | max: 30                    |
+| new_username    | string | max: 20                    |
+| new_email       | string | max: 30                    |
+| new_phone       | string | max: 12<br />match: number |
+| new_address     | string | max 100                    |
+| new_province    | string | max: 50                    |
+| new_country     | string | max: 20                    |
+| new_description | string | max: 1000                  |
 
 #### DELETE
 
-Delete user by user id
+Delete user by username
 
 * ```bash
-  /v1/users?id={userId}
+  /v1/user/:username
   ```
