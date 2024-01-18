@@ -12,7 +12,7 @@ import { DeleteAuthorize, isAuthenticated } from "../middlewares";
 import { body } from "express-validator";
 
 export default (router: Router) => {
-	router.get("/v1/user/all", getAllUsernameAndEmail);
+	router.get("/v1/user/public", getAllUsernameAndEmail);
 	router.get("/v1/user/:username", isAuthenticated, getCurrentUser);
 	router.get("/v1/user", isAuthenticated, getAllUser);
 	router.delete(

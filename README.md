@@ -9,74 +9,93 @@ This API intentionally to support integrationd data of freelancers, and for any 
 ## Endpoint
 
 ### Required Header
-* Authorization: YOUR_API_KEY
+
+* api-key: YOUR_API_KEY
 
 ### Public endpoint
 
 #### GET
+
 Get all users
+
 * ```bash
-  /v1/users
+  /v1/user/all
   ```
 
 #### POST
+
 Register new user
+
 * ```bash
   /v1/auth/register
   ```
-| Value  | Type | Option |
-| --- | --- | --- |
-| username  | string  | max: 20 |
-| email  | string  | max: 30 |
-| password  | string  | max: 14 |
-| role  | string  | max: 10 |
+
+| Value    | Type   | Option  |
+| -------- | ------ | ------- |
+| username | string | max: 20 |
+| email    | string | max: 30 |
+| password | string | max: 14 |
+| role     | string | max: 10 |
 
 Login a user
+
 * ```bash
   /v1/auth/login
   ```
-| Value  | Type|
-| --- | --- |
-| email  | string |
-| password  | string |
+
+| Value    | Type   |
+| -------- | ------ |
+| email    | string |
+| password | string |
 
 ### Endpoint (authentication required)
 
 #### GET
+
 Get all freelancers
+
 * ```bash
-  /v1/freelancers
+  /v1/freelancerr
   ```
 
 Get full information of all user
+
 * ```bash
-  /v1/users/all
+  /v1/user
   ```
 
 #### POST
+
 Register new freelancers
+
 * ```bash
   /v1/freelancers
   ```
-| Value  | Type | Option |
-| --- | --- | --- |
-| first_name  | string  | max: 30 |
-| last_name  | string  | max: 30 |
-| email  | string  | max: 30 |
-| phone  | string  | max: 12 <br> match: number |
-| country  | string  | max: 20 |
+
+| Value      | Type   | Option                        |
+| ---------- | ------ | ----------------------------- |
+| first_name | string | max: 30                       |
+| last_name  | string | max: 30                       |
+| email      | string | max: 30                       |
+| phone      | string | max: 12`<br>` match: number |
+| country    | string | max: 20                       |
 
 #### PATCH
+
 Update user value
-| Value  | Type | Option |
-| --- | --- | --- |
-| username  | string  | max: 20 |
+
+| Value    | Type   | Option  |
+| -------- | ------ | ------- |
+| username | string | max: 20 |
+
 * ```bash
   /v1/users?id={userId}
   ```
 
 #### DELETE
+
 Delete user by user id
+
 * ```bash
   /v1/users?id={userId}
   ```
