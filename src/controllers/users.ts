@@ -2,21 +2,21 @@ import { Request, Response } from "express";
 import { get } from "lodash";
 import { response, errorResponse } from "../response";
 import {
-	deleteUserById,
-	getUserById,
+	deleteUserByUsername,
+	getUserByUsername,
 	getUsers,
-	updateUserById,
+	updateUserByUsername,
 } from "../db/users";
 
 export const getCurrentUser = async (req: Request, res: Response) => {
 	try {
 		const { username } = req.params;
-		const userIdentity = get(req, "identity.username");
+		const userIdentity = get(req, "user.identity.username");
+
 		if (username !== userIdentity)
 			return errorResponse(401, "UNAUTHORIZE", "Invalid user identity", res);
 
-		const identityID = get(req, "identity._id");
-		const currentUser = await getUserById(identityID);
+		const currentUser = await getUserByUsername(userIdentity);
 
 		if (!currentUser)
 			return errorResponse(404, "NOT FOUND", "User not found", res);
@@ -30,7 +30,12 @@ export const getCurrentUser = async (req: Request, res: Response) => {
 		);
 	} catch (error) {
 		console.log(error);
-		return errorResponse(400, "ERROR", "Failed to get all user", res);
+		return errorResponse(
+			400,
+			"ERROR",
+			"Failed get current user: Internal server error",
+			res
+		);
 	}
 };
 
@@ -62,7 +67,12 @@ export const getAllUser = async (req: Request, res: Response) => {
 		return response(200, "SUCCESS", users, "Get all user", res);
 	} catch (error) {
 		console.log(error);
-		return errorResponse(400, "ERROR", "Failed get all user", res);
+		return errorResponse(
+			400,
+			"ERROR",
+			"Failed get all user: Internal server error",
+			res
+		);
 	}
 };
 
@@ -76,7 +86,10 @@ export const getAllUsernameAndEmail = async (req: Request, res: Response) => {
 			(sortByUsername !== "asc" && sortByUsername !== "desc") ||
 			(sortByEmail !== "asc" && sortByEmail !== "desc")
 		) {
-			users = await getUsers({ _id: 0, username: 1, email: 1 }, {});
+			users = await getUsers(
+				{ _id: 0, "identity.username": 1, "identity.email": 1 },
+				{}
+			);
 		} else {
 			let username;
 			let email;
@@ -84,7 +97,7 @@ export const getAllUsernameAndEmail = async (req: Request, res: Response) => {
 			sortByEmail === "asc" ? (email = 1) : (email = -1);
 
 			users = await getUsers(
-				{ _id: 0, username: 1, email: 1 },
+				{ _id: 0, "identity.username": 1, "identity.email": 1 },
 				{ username, email }
 			);
 		}
@@ -92,78 +105,108 @@ export const getAllUsernameAndEmail = async (req: Request, res: Response) => {
 		return response(200, "SUCCESS", users, "Get all username and email", res);
 	} catch (error) {
 		console.log(error);
-		return errorResponse(400, "ERROR", "Failed get username and email", res);
+		return errorResponse(
+			400,
+			"ERROR",
+			"Failed get username and email: Internal server error",
+			res
+		);
 	}
 };
 
 export const deleteCurrentUser = async (req: Request, res: Response) => {
 	try {
 		const { username } = req.params;
-		const userIdentity = get(req, "identity.username");
+		const userIdentity = get(req, "user.identity.username");
+
 		if (username !== userIdentity)
 			return errorResponse(401, "UNAUTHORIZE", "Invalid user identity", res);
 
-		const identityID = get(req, "identity._id");
-		const currentUser = await getUserById(identityID);
+		const currentUser = await getUserByUsername(userIdentity);
 
-		const deletedUser = await deleteUserById(currentUser._id.toString());
-
-		const filterResponse = {
-			username: deletedUser.username,
-			email: deletedUser.email,
-			role: deletedUser.role,
-		};
-
-		return response(
-			200,
-			"SUCCESS",
-			filterResponse,
-			`Delete user success: ${deletedUser.username}`,
-			res
+		const deletedUser = await deleteUserByUsername(
+			currentUser.identity.username
 		);
+
+		return response(200, "SUCCESS", deletedUser, "Delete user success", res);
 	} catch (error) {
 		console.log(error);
-		return errorResponse(400, "ERROR", "Failed deleting user", res);
+		return errorResponse(
+			400,
+			"ERROR",
+			"Failed deleting user: Internal server error",
+			res
+		);
 	}
 };
 
 export const updateCurrentUser = async (req: Request, res: Response) => {
 	try {
 		const { username } = req.params;
-		const { new_username } = req.body;
-		const userIdentity = get(req, "identity.username");
+		const {
+			new_first_name,
+			new_last_name,
+			new_username,
+			new_phone,
+			new_role,
+			new_street,
+			new_city,
+			new_province,
+			new_country,
+			new_description,
+		} = req.body;
+
+		if (
+			!new_first_name ||
+			!new_last_name ||
+			!new_username ||
+			!new_phone ||
+			!new_role ||
+			!new_street ||
+			!new_city ||
+			!new_province ||
+			!new_country ||
+			!new_description
+		) {
+			return errorResponse(400, "ERROR", "Missing necessary fields", res);
+		}
+
+		const userIdentity = get(req, "user.identity.username");
 
 		if (username !== userIdentity)
 			return errorResponse(401, "UNAUTHORIZE", "Invalid user identity", res);
 
-		if (!new_username) {
-			return errorResponse(400, "BAD REQUEST", "New username is missing", res);
-		}
+		const currentUser = await getUserByUsername(userIdentity);
 
-		const identityID = get(req, "identity._id");
-		const currentUser = await getUserById(identityID);
-
-		const user = await updateUserById(currentUser._id.toString(), {
-			username: new_username,
+		const user = await updateUserByUsername(currentUser.identity.username, {
+			identity: {
+				first_name: new_first_name,
+				last_name: new_last_name,
+				username: new_username,
+				phone: new_phone,
+				role: new_role,
+				description: new_description,
+			},
+			address: {
+				street: new_street,
+				city: new_city,
+				province: new_province,
+				country: new_country,
+			},
 		});
+
 		if (!user) {
-			return errorResponse(400, "ERROR", "Failed updating username", res);
+			return errorResponse(400, "ERROR", "User not found", res);
 		}
 
-		const filterResponse = {
-			username: user.username,
-			email: user.email,
-		};
-
-		return response(
-			200,
-			"SUCCESS",
-			filterResponse,
-			"Update username successful",
-			res
-		);
+		return response(200, "SUCCESS", user, "Update username successful", res);
 	} catch (error) {
 		console.log(error);
-		return errorResponse(400, "ERROR", "Failed updating username", res);
+		return errorResponse(
+			400,
+			"ERROR",
+			"Failed updating data: Internal server error",
+			res
+		);
 	}
 };
