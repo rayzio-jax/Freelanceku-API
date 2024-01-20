@@ -1,53 +1,48 @@
 import { Request, Response } from "express";
 import { errorResponse, response } from "../response";
+import { get } from "lodash";
 import {
-	getFreelancerByEmail,
+	getUserByEmail,
 	getTransactions,
 	createTransaction,
-} from "../db/freelancers";
+	getTransactionByPaymentId,
+} from "../db/users";
 
-export const getAllTransaction = async (req: Request, res: Response) => {
+export const updateTransaction = async (req: Request, res: Response) => {
 	try {
-		const sortByAmount = req?.query?.sortByAmount as string;
-		let transactions: Object;
-
-		if (!sortByAmount) {
-			transactions = getTransactions();
-		} else {
-			let amount;
-			sortByAmount === "asc" ? (amount = 1) : (amount = -1);
-
-			transactions = getTransactions({ amount });
-		}
-
-		return response(200, "SUCCESS", transactions, "Get all transaction", res);
 	} catch (error) {
 		console.log(error);
-		return errorResponse(400, "ERROR", "Failed get all transaction", res);
+		return errorResponse(
+			400,
+			"ERROR",
+			"Failed update transaction: Internal server error",
+			res
+		);
 	}
 };
 
 export const createNewTransaction = async (req: Request, res: Response) => {
 	try {
-		const {
-			sender_email,
-			receiver_email,
-			payment_id,
-			amount,
-			message,
-			status,
-		} = req.body;
+		const { payment_id, receiver_email, amount, message, status } = req.body;
+
+		const paymentID = await getTransactionByPaymentId(payment_id);
+
+		if (paymentID)
+			return errorResponse(400, "ERROR", "Transaction log existed", res);
+
+		const senderEmail = get(req, "user.identity.email");
 
 		if (!amount)
 			return errorResponse(400, "ERROR", "No amount on transaction", res);
+
 		if (!message)
 			return errorResponse(400, "ERROR", "Message is required", res);
 
-		const sender = getFreelancerByEmail(sender_email);
+		const sender = await getUserByEmail(senderEmail);
 		if (!sender)
 			return errorResponse(400, "ERROR", "Sender credentials not exist", res);
 
-		const receiver = getFreelancerByEmail(receiver_email);
+		const receiver = await getUserByEmail(receiver_email);
 		if (!receiver)
 			return errorResponse(400, "ERROR", "Receiver credentials not exist", res);
 
@@ -55,9 +50,9 @@ export const createNewTransaction = async (req: Request, res: Response) => {
 			return errorResponse(400, "ERROR", "Payment credentials not exist", res);
 
 		const transaction = await createTransaction({
-			sender_id: (await sender)._id,
-			receiver_id: (await receiver)._id,
 			payment_id,
+			sender: sender._id,
+			receiver: receiver._id,
 			amount,
 			message,
 			status,
@@ -72,6 +67,37 @@ export const createNewTransaction = async (req: Request, res: Response) => {
 		);
 	} catch (error) {
 		console.log(error);
-		return errorResponse(400, "ERROR", "Failed input new transaction", res);
+		return errorResponse(
+			400,
+			"ERROR",
+			"Failed create new transaction: Internal server error",
+			res
+		);
+	}
+};
+
+export const getAllTransaction = async (req: Request, res: Response) => {
+	try {
+		const sortByAmount = req?.query?.sortByAmount as string;
+		let transactions: Object;
+
+		if (!sortByAmount) {
+			transactions = await getTransactions();
+		} else {
+			let amount;
+			sortByAmount === "asc" ? (amount = 1) : (amount = -1);
+
+			transactions = await getTransactions({ amount });
+		}
+
+		return response(200, "SUCCESS", transactions, "Get all transaction", res);
+	} catch (error) {
+		console.log(error);
+		return errorResponse(
+			400,
+			"ERROR",
+			"Failed get all transaction: Internal server error",
+			res
+		);
 	}
 };
