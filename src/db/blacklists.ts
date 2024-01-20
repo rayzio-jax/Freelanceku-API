@@ -4,7 +4,7 @@ const BlackListSchema = new mongoose.Schema(
 		token: {
 			type: String,
 			required: true,
-			ref: "users",
+			ref: "User",
 		},
 	},
 	{ timestamps: true }

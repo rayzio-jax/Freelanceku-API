@@ -2,70 +2,184 @@ import "dotenv/config";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
+import _ from "lodash";
+
+function generateID(): string {
+	let id = "";
+	const characters =
+		"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+	for (let i = 0; i < 16; i++) {
+		id += characters.charAt(Math.floor(Math.random() * characters.length));
+	}
+
+	return id;
+}
+
+const TransactionSchema = new mongoose.Schema(
+	{
+		_id: {
+			type: String,
+			required: true,
+			default: generateID,
+		},
+		payment_id: { type: String, required: false },
+		sender: { type: mongoose.SchemaTypes.ObjectId, ref: "User" },
+		receiver: { type: mongoose.SchemaTypes.ObjectId, ref: "User" },
+		amount: { type: Number, min: 50000, required: true },
+		message: { type: String, max: 100, uppercase: true, required: true },
+		status: {
+			type: String,
+			uppercase: true,
+			enum: ["UNPROCESSED", "FAILED", "PENDING", "FINISH"],
+			required: true,
+			default: "UNPROCESSED",
+		},
+	},
+	{
+		timestamps: { updatedAt: false },
+	}
+);
+
+export const Transaction = mongoose.model("transactions", TransactionSchema);
+
+export const getTransactions = (sorter?: {}) =>
+	Transaction.find({}, { __v: 0, createdAt: 0 })
+		?.populate(
+			"sender",
+			"identity.first_name identity.last_name identity.email"
+		)
+		?.populate(
+			"receiver",
+			"identity.first_name identity.last_name identity.email"
+		)
+		?.sort(sorter);
+
+export const getTransactionByPaymentId = (payment_id: string) =>
+	Transaction.findOne({ payment_id }).populate("sender").populate("receiver");
+
+export const createTransaction = async (values: Record<string, any>) => {
+	const sender = await User.findById(values.sender);
+	const receiver = await User.findById(values.receiver);
+
+	if (!sender || !receiver) throw new Error("Sender or receiver not exist");
+
+	if (values.sender.equals(values.receiver))
+		throw new Error("Sender and receiver cannot be the same user");
+
+	// Create a new transaction
+	const transaction = new Transaction(values);
+	await transaction.save();
+
+	// Add the transaction to the sender and receiver's transaction history
+	sender.transaction.push(transaction);
+	receiver.transaction.push(transaction);
+	await sender.save();
+	await receiver.save();
+
+	return transaction.toObject();
+};
 
 const UserSchema = new mongoose.Schema(
 	{
-		username: {
-			type: String,
-			required: true,
-			lowercase: true,
-			trim: true,
-			max: 20,
-		},
-		email: {
-			type: String,
-			required: true,
-			max: 30,
-			unique: true,
-			lowercase: true,
-			trim: true,
+		identity: {
+			first_name: {
+				type: String,
+				max: 30,
+				uppercase: true,
+				default: "Marcus",
+			},
+			last_name: {
+				type: String,
+				max: 30,
+				uppercase: true,
+				default: "Holloway",
+			},
+			username: {
+				type: String,
+				required: true,
+				trim: true,
+				max: 20,
+				default: "User",
+			},
+			email: {
+				type: String,
+				max: 30,
+				required: true,
+				unique: true,
+				lowercase: true,
+				trim: true,
+				default: "User@email.com",
+			},
+			phone: {
+				type: String,
+				max: 15,
+				match: /^\d{0,15}$/,
+			},
+			role: {
+				type: String,
+				enum: ["r-fa00", "r-fa04", "r-fa07"],
+				lowercase: true,
+				max: 10,
+				default: "r-fa04",
+			},
+			description: {
+				type: String,
+				lowercase: true,
+				max: 1000,
+				default: "No description",
+			},
 		},
 		authentication: {
 			key: { type: String, select: false },
 			password: { type: String, required: true, min: 8, select: false },
 			sessionToken: { type: String, select: false },
 		},
-		role: {
-			type: String,
-			required: true,
-			lowercase: true,
-			max: 10,
-			default: "r-fa00",
+		address: {
+			street: { type: String, uppercase: true, max: 60, default: "None" },
+			city: { type: String, uppercase: true, max: 30, default: "None" },
+			province: { type: String, uppercase: true, max: 20, default: "None" },
+			country: { type: String, uppercase: true, max: 15, default: "None" },
 		},
-		isVerified: {
-			type: Boolean,
-			default: false,
-			select: false,
+		verification: {
+			emailIsVerified: {
+				type: Boolean,
+				default: false,
+				select: false,
+			},
+			phoneIsVerified: {
+				type: Boolean,
+				default: false,
+				select: false,
+			},
 		},
+		transaction: { type: [TransactionSchema] },
 	},
 	{ timestamps: true }
 );
 
-UserSchema.pre("save", function (next) {
+UserSchema.pre("save", async function (next) {
 	try {
 		const user = this;
 		if (!user.isNew) return next(); // If the document is not new, skip this step
 
 		const token = crypto.randomUUID();
 
-		bcrypt.genSalt(10, (err, salt) => {
-			if (err) return next(err);
-			bcrypt.hash(token, salt, function (err, hash) {
-				if (err) return next(err);
-				user.authentication.key = hash;
-			});
-		});
+		const salt = await bcrypt.genSalt(10);
+		const hash = await bcrypt.hash(token, salt);
+		user.authentication.key = hash;
 
-		if (!user.isModified("authentication.password")) return next();
-		bcrypt.genSalt(10, (err, salt) => {
-			if (err) return next(err);
+		if (user.isModified("authentication.password")) {
+			const passwordSalt = await bcrypt.genSalt(10);
+			const passwordHash = await bcrypt.hash(
+				user.authentication.password,
+				passwordSalt
+			);
 
-			bcrypt.hash(user.authentication.password, salt, (err, hash) => {
-				if (err) return next(err);
-				user.authentication.password = hash;
-				next();
-			});
-		});
+			user.authentication.password = passwordHash;
+		}
+
+		next();
 	} catch (error) {
 		console.error(error);
 		next(error);
@@ -79,22 +193,40 @@ export const getUsers = (filter?: Object, sorter?: {}) =>
 
 export const getUserById = (_id: string) => User.findOne({ _id });
 
-export const getUserByEmail = (email: string) => User.findOne({ email });
+export const getUserByEmail = (email: string) =>
+	User.findOne({ "identity.email": email });
 
 export const getUserByUsername = (username: string) =>
-	User.findOne({ username });
+	User.findOne({ "identity.username": username });
 
 export const getUserBySession = (sessionToken: string) =>
 	User.findOne({ "authentication.sessionToken": sessionToken });
 
-export const createUser = (values: Record<string, any>) =>
-	new User(values).save().then((user) => user.toObject());
+export const createUser = async (values: Record<string, any>) =>
+	await new User(values).save().then((user) => user.toObject());
 
-export const deleteUserById = (_id: string) => User.findByIdAndDelete({ _id });
+export const deleteUserByUsername = (username: string) =>
+	User.findByIdAndDelete({ "identity.username": username });
 
-export const updateUserById = async (
-	_id: string,
+export const updateUserByUsername = async (
+	username: string,
 	values: Record<string, any>
 ) => {
-	return await User.findByIdAndUpdate({ _id }, values, { new: true });
+	const user = await User.findOne({ "identity.username": username });
+
+	// if no identity.email in values, identity.email remain the same
+	user && !values.identity.email
+		? (values.identity.email = user.identity.email)
+		: null;
+
+	// if no identity.username in values, identity.username remain the same
+	user && !values.identity.username
+		? (values.identity.username = user.identity.username)
+		: null;
+
+	return await User.findOneAndUpdate(
+		{ "identity.username": username },
+		values,
+		{ new: true, upsert: true }
+	);
 };
