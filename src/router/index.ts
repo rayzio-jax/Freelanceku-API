@@ -1,8 +1,8 @@
 import { Router, Request, Response } from "express";
 import authentication from "./authentication";
 import users from "./users";
-import freelancers from "./freelancers";
 import { response, errorResponse } from "../response";
+import transactions from "./transactions";
 
 const router = Router();
 
@@ -12,13 +12,13 @@ router.get("/v1", (req: Request, res: Response) => {
 		response(200, "SUCCESS", {}, "Welcome to my API", res);
 	} catch (error) {
 		console.log(error);
-		return errorResponse(400, "ERROR", "Internal Server Error", res);
+		return errorResponse(400, "ERROR", "Internal server error", res);
 	}
 });
 
 export default (): Router => {
 	authentication(router);
 	users(router);
-	freelancers(router);
+	transactions(router);
 	return router;
 };

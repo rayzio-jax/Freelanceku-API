@@ -12,26 +12,26 @@ export default (router: Router) => {
 	router.get("/v1/transaction", isAuthenticated, getAllTransaction);
 	router.post(
 		"/v1/transaction/new",
-		body("sender_email")
-			.notEmpty()
-			.withMessage("Sender email is missing")
-			.isEmail()
-			.withMessage("Enter a valid email address")
-			.normalizeEmail(),
+		body("payment_id").notEmpty().withMessage("Payment ID is missing"),
 		body("receiver_email")
-			.notEmpty()
-			.withMessage("Sender email is missing")
-			.isEmail()
-			.withMessage("Enter a valid email address")
-			.normalizeEmail(),
+			.normalizeEmail({
+				gmail_remove_dots: false,
+			})
+			.isEmail({ host_blacklist: ["yopmail.com"] })
+			.withMessage("Enter a valid email address"),
 		body("amount")
+			.isLength({ min: 4 })
+			.withMessage("Minimum amount is 50.000")
+			.toInt()
+			.isNumeric()
+			.withMessage("Amount must be number, not string")
 			.notEmpty()
-			.withMessage("Transaction amount must be not empty")
-			.toInt(),
+			.withMessage("Transaction amount must be not empty"),
 		body("message")
+			.escape()
+			.trim()
 			.notEmpty()
-			.withMessage("Transaction message is required")
-			.escape(),
+			.withMessage("Transaction message is required"),
 		Validate,
 		isAuthenticated,
 		createNewTransaction
