@@ -20,10 +20,10 @@ export const Logout = async (req: Request, res: Response) => {
 		const checkToken = await Blacklist.findOne({ token: accessToken });
 		if (checkToken) return res.sendStatus(204);
 
-		const newLoggedOutUser = new Blacklist({
+		const logoutUser = new Blacklist({
 			token: accessToken,
 		});
-		await newLoggedOutUser.save();
+		await logoutUser.save();
 		res.setHeader("Clear-Site-Data", '"cookies"');
 		return response(200, "SUCCESS", "", "You have been logged out!", res);
 	} catch (error) {
@@ -50,7 +50,7 @@ export const Login = async (req: Request, res: Response) => {
 		);
 
 		if (!user) {
-			return errorResponse(403, "FORBIDDEN", "User not exist", res);
+			return errorResponse(403, "FORBIDDEN", "Wrong email or password", res);
 		}
 
 		const expectedHash = await bcrypt.compare(
@@ -64,6 +64,8 @@ export const Login = async (req: Request, res: Response) => {
 
 		const payload = {
 			_id: user._id,
+			username: user.identity.username,
+			email: user.identity.email,
 		};
 
 		const PRIVATE_KEY = process.env.PRIVATE_KEY;
@@ -96,8 +98,8 @@ export const Login = async (req: Request, res: Response) => {
 		res.cookie("SessionTokenID", user.authentication.sessionToken, options);
 
 		const savedUser = {
-			username: user.username,
-			email: user.email,
+			username: user.identity.username,
+			email: user.identity.email,
 			sessionExpiredAt: moment()
 				.add(options.maxAge, "milliseconds")
 				.format("MMMM Do YYYY, h:mm:ss a"),
@@ -123,14 +125,23 @@ export const Login = async (req: Request, res: Response) => {
 
 export const Register = async (req: Request, res: Response) => {
 	try {
-		const { username, email, password, role } = req.body;
+		const {
+			first_name,
+			last_name,
+			username,
+			email,
+			password,
+			phone,
+			role,
+			street,
+			city,
+			province,
+			country,
+			description,
+		} = req.body;
+
 		if (!username || !email || !password) {
-			return errorResponse(
-				400,
-				"INVALID",
-				"Username, password or email is missing",
-				res
-			);
+			return errorResponse(400, "ERROR", "Missing necessary fields", res);
 		}
 
 		const existingUser = await getUserByEmail(email);
@@ -139,17 +150,29 @@ export const Register = async (req: Request, res: Response) => {
 		}
 
 		const user = await createUser({
-			username,
-			email,
+			identity: {
+				first_name,
+				last_name,
+				username,
+				email,
+				phone,
+				role,
+				description,
+			},
 			authentication: {
 				password,
 			},
-			role,
+			address: {
+				street,
+				city,
+				province,
+				country,
+			},
 		});
 
 		const filterResponse = {
-			username: user.username,
-			email: user.email,
+			username: user.identity.username,
+			email: user.identity.email,
 			apiKey: user.authentication.key,
 		};
 
@@ -164,12 +187,3 @@ export const Register = async (req: Request, res: Response) => {
 		);
 	}
 };
-
-// export const Verify = async (req: Request, res: Response) => {
-// 	try {
-// 		const user = getUserByEmail;
-// 	} catch (error) {
-// 		console.log(error);
-// 		return errorResponse(400, "ERROR", "Failed To Verify User", res);
-// 	}
-// };
