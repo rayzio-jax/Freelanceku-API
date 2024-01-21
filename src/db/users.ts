@@ -106,20 +106,20 @@ const UserSchema = new mongoose.Schema(
 				type: String,
 				max: 30,
 				uppercase: true,
-				default: "Marcus",
+				default: "unknown",
 			},
 			last_name: {
 				type: String,
 				max: 30,
 				uppercase: true,
-				default: "Holloway",
+				default: "unknown",
 			},
 			username: {
 				type: String,
 				required: true,
 				trim: true,
 				max: 20,
-				default: "User",
+				default: "user",
 			},
 			email: {
 				type: String,
@@ -128,7 +128,7 @@ const UserSchema = new mongoose.Schema(
 				unique: true,
 				lowercase: true,
 				trim: true,
-				default: "User@email.com",
+				default: "user@email.com",
 			},
 			phone: {
 				type: String,
