@@ -31,7 +31,7 @@ const TransactionSchema = new mongoose.Schema(
 		status: {
 			type: String,
 			uppercase: true,
-			enum: ["UNPROCESSED", "FAILED", "PENDING", "FINISH"],
+			enum: ["UNPROCESSED", "FAILED", "PENDING", "DONE"],
 			required: true,
 			default: "UNPROCESSED",
 		},
@@ -56,7 +56,15 @@ export const getTransactions = (sorter?: {}) =>
 		?.sort(sorter);
 
 export const getTransactionByPaymentId = (payment_id: string) =>
-	Transaction.findOne({ payment_id }).populate("sender").populate("receiver");
+	Transaction.findOne({ payment_id })
+		?.populate(
+			"sender",
+			"identity.first_name identity.last_name identity.email"
+		)
+		?.populate(
+			"receiver",
+			"identity.first_name identity.last_name identity.email"
+		);
 
 export const createTransaction = async (values: Record<string, any>) => {
 	const sender = await User.findById(values.sender);
@@ -77,7 +85,18 @@ export const createTransaction = async (values: Record<string, any>) => {
 	await sender.save();
 	await receiver.save();
 
-	return transaction.toObject();
+	// Populate the sender and receiver fields
+	const populatedTransaction = await Transaction.findById(transaction._id)
+		?.populate(
+			"sender",
+			"identity.first_name identity.last_name identity.email"
+		)
+		?.populate(
+			"receiver",
+			"identity.first_name identity.last_name identity.email"
+		);
+
+	return populatedTransaction.toObject();
 };
 
 const UserSchema = new mongoose.Schema(
