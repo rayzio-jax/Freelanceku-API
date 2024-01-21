@@ -26,12 +26,18 @@ export default (router: Router) => {
 			.isNumeric()
 			.withMessage("Amount must be number, not string")
 			.notEmpty()
-			.withMessage("Transaction amount must be not empty"),
+			.withMessage("Transaction amount is required"),
 		body("message")
 			.escape()
 			.trim()
 			.notEmpty()
 			.withMessage("Transaction message is required"),
+		body("status")
+			.toUpperCase()
+			.escape()
+			.trim()
+			.notEmpty()
+			.withMessage("Status is required"),
 		Validate,
 		isAuthenticated,
 		createNewTransaction
