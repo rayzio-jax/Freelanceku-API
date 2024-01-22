@@ -1,14 +1,16 @@
-# Freelance API
+# Freelancekuuu API
 
-This is a public Freelance API where you can get a data of freelancers. If this API is approved by government to integrate data of many people identity I might need a team to maintenance this and handle all kind of regulations.
+Do you ever think that why every freelancing platform have their own data and it's not integrated each other, so if you wanna find a freelancer to hire you should look into different platforms? So this API might help any new freelancing platform to integrate data each other, and you can customize your own tax or fee for your platform services, or developing a features that value your platform from other platform.
 
 ## Purpose
 
-This API intentionally to support integrationd data of freelancers, and for any freelance market to get freelancer data to integrated each other.
+This API intentionally to support integration data of freelancers into such of freelancing platform or marketplace. So any platform could focus building their own features instead, and use this API to integrate data of freelancers.
+
+Example, if you building a platform XYZ and you need data about freelancers, you could use this API to integrate with freelancers data, and you can focus to build a features for your platform such as chatbot, real-time chat for freelancer, customer service chat, built-in meeting feature, and etc.
 
 ## Endpoint
 
-### Required Header
+### Required headers for authorization
 
 * api-key: YOUR_API_KEY
 
@@ -18,31 +20,42 @@ This API intentionally to support integrationd data of freelancers, and for any 
 
 Get all user as a public
 
-* ```bash
-  /v1/user/public
-  ```
+```bash
+/v1/user/public
+```
 
 #### POST
 
 Register new user
 
-* ```bash
-  /v1/auth/register
-  ```
+```bash
+/v1/auth/register
+```
+
 Body
-| Value    | Type   | Option  |
-| -------- | ------ | ------- |
-| username | string | max: 20 |
-| email    | string | max: 30 |
-| password | string | max: 14 |
-| role     | string | max: 10 |
+
+| Value       | Type                 | Optional |
+| ----------- | -------------------- | -------- |
+| first_name  | string               | yes      |
+| last_name   | string               | yes      |
+| username    | string               | required |
+| email       | string               | required |
+| password    | string               | required |
+| phone       | [countryID] + number | yes      |
+| street      | string               | yes      |
+| city        | string               | yes      |
+| province    | string               | yes      |
+| country     | string               | yes      |
+| description | string               | yes      |
 
 Login a user
 
-* ```bash
-  /v1/auth/login
-  ```
+```bash
+/v1/auth/login
+```
+
 Body
+
 | Value    | Type   |
 | -------- | ------ |
 | email    | string |
@@ -52,93 +65,77 @@ Body
 
 #### GET
 
-Get all freelancer
-
-* ```bash
-  /v1/freelancer
-  ```
-
 Get full information of all user
 
-* ```bash
-  /v1/user
-  ```
+```bash
+/v1/user
+```
+
+Get all information about user
+
+```bash
+/v1/user/bio
+```
+
+Get current logged in user
+
+```bash
+/v1/user/:username
+```
 
 Get all transaction log
 
-* ```bash
-  /v1/transaction
-  ```
+```bash
+/v1/transaction
+```
 
 #### POST
 
-Register new freelancer
-
-* ```bash
-  /v1/freelancer/new
-  ```
-Body
-| Value       | Type   | Option                     |
-| ----------- | ------ | -------------------------- |
-| first_name  | string | max: 30                    |
-| last_name   | string | max: 30                    |
-| username    | string | max: 20                    |
-| email       | string | max: 30                    |
-| phone       | string | max: 12<br />match: number |
-| address     | string | max 100                    |
-| province    | string | max: 50                    |
-| country     | string | max: 20                    |
-| description | string | max: 1000                  |
-
 Create new transaction log
 
-* ```bash
-  /v1/transaction/new
-  ```
+```bash
+/v1/transaction/new
+```
+
 Body
-| Value          | Type   | Option   |
-| -------------- | ------ | -------- |
-| sender_email   | string |          |
-| receiver_email | string |          |
-| amount         | number | max: 10  |
-| message        | string | max: 100 |
+
+| Value          | Type                                                    |
+| -------------- | ------------------------------------------------------- |
+| payment_id     | string                                                  |
+| sender_email   | string                                                  |
+| receiver_email | string                                                  |
+| amount         | number                                                  |
+| message        | string                                                  |
+| status         | string enum<br />[ UNPROCESSED, FAILED, PENDING, DONE ] |
 
 #### PATCH
 
-Update user by username
+Update user data
 
-* ```bash
-  /v1/user/:username
-  ```
-
-Body
-| Value        | Type   | Option  |
-| ------------ | ------ | ------- |
-| new_username | string | max: 20 |
-
-Update freelancer by username
-
-* ```bash
-  /v1/freelancer/:username
-  ```
+```bash
+/v1/user/:username
+```
 
 Body
-| Value           | Type   | Option                     |
-| --------------- | ------ | -------------------------- |
-| new_first_name  | string | max: 30                    |
-| new_last_name   | string | max: 30                    |
-| new_username    | string | max: 20                    |
-| new_email       | string | max: 30                    |
-| new_phone       | string | max: 12<br />match: number |
-| new_address     | string | max 100                    |
-| new_province    | string | max: 50                    |
-| new_country     | string | max: 20                    |
-| new_description | string | max: 1000                  |
+
+| Value           | Type   |
+| --------------- | ------ |
+| new_first_name  | string |
+| new_last_name   | string |
+| new_username    | string |
+| new_phone       | number |
+| new_street      | string |
+| new_city        | string |
+| new_province    | string |
+| new_country     | string |
+| new_description | string |
+
+> all value here is optional, just fill what you need and leave the rest empty or remain as current value
 
 #### DELETE
 
 Delete user by username
 
-* ```bash
-  /v1/user/:username
-  ```
+```bash
+/v1/user/:username
+```
