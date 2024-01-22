@@ -95,7 +95,7 @@ export const Login = async (req: Request, res: Response) => {
 			secure: true,
 		};
 
-		res.cookie("SessionTokenID", user.authentication.sessionToken, options);
+		res.cookie("SessionID", user.authentication.sessionToken, options);
 
 		const savedUser = {
 			username: user.identity.username,
