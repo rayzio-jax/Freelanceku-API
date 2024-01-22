@@ -8,6 +8,48 @@ import {
 	updateUserByUsername,
 } from "../db/users";
 
+export const getAllUserBio = async (req: Request, res: Response) => {
+	try {
+		const sortByCreatedDate = (req.query?.sortByCreatedDate ?? "asc") as string;
+		let users;
+
+		if (!sortByCreatedDate) {
+			users = await getUsers(
+				{
+					"identity.first_name": 1,
+					"identity.last_name": 1,
+					"identity.description": 1,
+					"address.province": 1,
+					"address.country": 1,
+				},
+				{}
+			);
+		} else {
+			let createdAt;
+			sortByCreatedDate === "asc" ? (createdAt = 1) : (createdAt = -1);
+			users = await getUsers(
+				{
+					"identity.first_name": 1,
+					"identity.last_name": 1,
+					"address.province": 1,
+					"address.country": 1,
+					"identity.description": 1,
+				},
+				{ createdAt }
+			);
+		}
+		return response(200, "SUCCESS", users, "Get all user bio", res);
+	} catch (error) {
+		console.log(error);
+		return errorResponse(
+			400,
+			"ERROR",
+			"Failed get all user bio: Internal server error",
+			res
+		);
+	}
+};
+
 export const getCurrentUser = async (req: Request, res: Response) => {
 	try {
 		const { username } = req.params;
