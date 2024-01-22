@@ -137,14 +137,14 @@ const UserSchema = new mongoose.Schema(
 			},
 			role: {
 				type: String,
-				enum: ["r-fa00", "r-fa04", "r-fa07"],
+				enum: ["r-fa00", "r-fa07"],
 				lowercase: true,
 				max: 10,
-				default: "r-fa04",
+				default: "r-fa07",
 			},
 			description: {
 				type: String,
-				lowercase: true,
+				uppercase: true,
 				max: 1000,
 				default: "No description",
 			},
