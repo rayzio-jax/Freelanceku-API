@@ -36,17 +36,17 @@ Body
 
 | Value       | Type                 | Optional |
 | ----------- | -------------------- | -------- |
-| first_name  | string               | yes      |
-| last_name   | string               | yes      |
+| first_name  | string               | ✔️     |
+| last_name   | string               | ✔️     |
 | username    | string               | required |
 | email       | string               | required |
 | password    | string               | required |
-| phone       | [countryID] + number | yes      |
-| street      | string               | yes      |
-| city        | string               | yes      |
-| province    | string               | yes      |
-| country     | string               | yes      |
-| description | string               | yes      |
+| phone       | [countryID] + number | ✔️     |
+| street      | string               | ✔️     |
+| city        | string               | ✔️     |
+| province    | string               | ✔️     |
+| country     | string               | ✔️     |
+| description | string               | ✔️     |
 
 Login a user
 
@@ -118,17 +118,17 @@ Update user data
 
 Body
 
-| Value           | Type   |
-| --------------- | ------ |
-| new_first_name  | string |
-| new_last_name   | string |
-| new_username    | string |
-| new_phone       | number |
-| new_street      | string |
-| new_city        | string |
-| new_province    | string |
-| new_country     | string |
-| new_description | string |
+| Value           | Type   | Optional |
+| --------------- | ------ | -------- |
+| new_first_name  | string | ✖️     |
+| new_last_name   | string | ✖️     |
+| new_username    | string | ✖️     |
+| new_phone       | number | ✖️     |
+| new_street      | string | ✖️     |
+| new_city        | string | ✖️     |
+| new_province    | string | ✖️     |
+| new_country     | string | ✖️     |
+| new_description | string | ✖️     |
 
 > all value here is optional, just fill what you need and leave the rest empty or remain as current value
 
