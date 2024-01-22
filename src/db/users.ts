@@ -233,14 +233,50 @@ export const updateUserByUsername = async (
 ) => {
 	const user = await User.findOne({ "identity.username": username });
 
-	// if no identity.email in values, identity.email remain the same
+	// if no any identity data in values, identity data remain the same
+
+	user && !values.identity.first_name
+		? (values.identity.first_name = user.identity.first_name)
+		: null;
+
+	user && !values.identity.last_name
+		? (values.identity.last_name = user.identity.last_name)
+		: null;
+
+	user && !values.identity.username
+		? (values.identity.username = user.identity.username)
+		: null;
+
 	user && !values.identity.email
 		? (values.identity.email = user.identity.email)
 		: null;
 
-	// if no identity.username in values, identity.username remain the same
-	user && !values.identity.username
-		? (values.identity.username = user.identity.username)
+	user && !values.identity.phone
+		? (values.identity.phone = user.identity.phone)
+		: null;
+
+	user && !values.identity.role
+		? (values.identity.role = user.identity.role)
+		: null;
+
+	user && !values.identity.description
+		? (values.identity.description = user.identity.description)
+		: null;
+
+	user && !values.address.street
+		? (values.address.street = user.address.street)
+		: null;
+
+	user && !values.address.city
+		? (values.address.city = user.address.city)
+		: null;
+
+	user && !values.address.province
+		? (values.address.province = user.address.province)
+		: null;
+
+	user && !values.address.country
+		? (values.address.country = user.address.country)
 		: null;
 
 	return await User.findOneAndUpdate(
