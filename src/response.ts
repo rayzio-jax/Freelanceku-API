@@ -2,7 +2,7 @@ import { Response } from "express";
 export const response = (
 	statusCode: number,
 	status: string,
-	data: [],
+	data: {},
 	message: string,
 	res: Response
 ) => {
