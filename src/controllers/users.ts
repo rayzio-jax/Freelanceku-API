@@ -190,7 +190,6 @@ export const updateCurrentUser = async (req: Request, res: Response) => {
 			new_last_name,
 			new_username,
 			new_phone,
-			new_role,
 			new_street,
 			new_city,
 			new_province,
@@ -203,7 +202,6 @@ export const updateCurrentUser = async (req: Request, res: Response) => {
 			!new_last_name ||
 			!new_username ||
 			!new_phone ||
-			!new_role ||
 			!new_street ||
 			!new_city ||
 			!new_province ||
@@ -226,7 +224,6 @@ export const updateCurrentUser = async (req: Request, res: Response) => {
 				last_name: new_last_name,
 				username: new_username,
 				phone: new_phone,
-				role: new_role,
 				description: new_description,
 			},
 			address: {
