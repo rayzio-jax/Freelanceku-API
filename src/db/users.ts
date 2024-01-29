@@ -225,7 +225,7 @@ export const createUser = async (values: Record<string, any>) =>
 	await new User(values).save().then((user) => user.toObject());
 
 export const deleteUserByUsername = (username: string) =>
-	User.findByIdAndDelete({ "identity.username": username });
+	User.findOneAndDelete({ "identity.username": username });
 
 export const updateUserByUsername = async (
 	username: string,
