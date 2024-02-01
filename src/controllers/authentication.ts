@@ -50,7 +50,7 @@ export const Login = async (req: Request, res: Response) => {
 		);
 
 		if (!user) {
-			return errorResponse(403, "FORBIDDEN", "Wrong email or password", res);
+			return errorResponse(403, "FORBIDDEN", "User does not exist", res);
 		}
 
 		const expectedHash = await bcrypt.compare(
