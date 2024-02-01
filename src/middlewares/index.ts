@@ -12,7 +12,8 @@ export const isAuthenticated = async (
 	next: NextFunction
 ) => {
 	try {
-		const apiKey = req.headers["api-key"];
+		const apiKey = req.headers["api-key"] as string;
+		req.headers.authorization = apiKey;
 		const authHeader = req.headers["cookie"];
 		if (!authHeader)
 			return errorResponse(404, "NOT FOUND", "Cookie not found", res);
