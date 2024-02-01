@@ -9,7 +9,7 @@ import {
 	updateCurrentUser,
 } from "../controllers/users";
 import Validate from "../middlewares/validate";
-import { DeleteAuthorize, isAuthenticated } from "../middlewares";
+import { isAuthenticated } from "../middlewares";
 import { body } from "express-validator";
 
 export default (router: Router) => {
@@ -17,12 +17,7 @@ export default (router: Router) => {
 	router.get("/v1/user/bio", isAuthenticated, getAllUserBio);
 	router.get("/v1/user/:username", isAuthenticated, getCurrentUser);
 	router.get("/v1/user", isAuthenticated, getAllUser);
-	router.delete(
-		"/v1/user/:username",
-		isAuthenticated,
-		DeleteAuthorize,
-		deleteCurrentUser
-	);
+	router.delete("/v1/user/:username", isAuthenticated, deleteCurrentUser);
 	router.patch(
 		"/v1/user/:username",
 		body("new_first_name")
