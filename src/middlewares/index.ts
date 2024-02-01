@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { Request, Response, NextFunction } from "express";
-import { get, merge } from "lodash";
+import { merge } from "lodash";
 import { errorResponse } from "../response";
 import { getUserBySession } from "../db/users";
 import { verifyToken } from "../helpers";
