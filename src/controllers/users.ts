@@ -161,6 +161,9 @@ export const deleteCurrentUser = async (req: Request, res: Response) => {
 		const { username } = req.params;
 		const userIdentity = get(req, "user.identity.username");
 
+		if (!userIdentity)
+			return errorResponse(401, "UNAUTHORIZE", "User not authorized", res);
+
 		if (username !== userIdentity)
 			return errorResponse(401, "UNAUTHORIZE", "Invalid user identity", res);
 
