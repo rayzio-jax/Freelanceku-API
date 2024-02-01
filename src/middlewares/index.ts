@@ -6,35 +6,6 @@ import { getUserBySession } from "../db/users";
 import { verifyToken } from "../helpers";
 import { Blacklist } from "../db/blacklists";
 
-export const DeleteAuthorize = async (
-	req: Request,
-	res: Response,
-	next: NextFunction
-) => {
-	try {
-		const { username } = req.body;
-		const currentUsername = get(req, "user.identity.username") as string;
-
-		if (!currentUsername) {
-			return errorResponse(401, "UNAUTHORIZE", "User not authorized", res);
-		}
-
-		if (currentUsername.toString() !== username) {
-			return errorResponse(401, "UNAUTHORIZE", "Invalid user identity", res);
-		}
-
-		next();
-	} catch (error) {
-		console.log(error);
-		return errorResponse(
-			400,
-			"ERROR",
-			"Server error: Failed to authenticate",
-			res
-		);
-	}
-};
-
 export const isAuthenticated = async (
 	req: Request,
 	res: Response,
