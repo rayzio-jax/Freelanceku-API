@@ -138,26 +138,12 @@ export const updateCurrentUser = async (req: Request, res: Response) => {
 			new_last_name,
 			new_username,
 			new_phone,
+			new_description,
 			new_street,
 			new_city,
 			new_province,
 			new_country,
-			new_description,
 		} = req.body;
-
-		if (
-			!new_first_name ||
-			!new_last_name ||
-			!new_username ||
-			!new_phone ||
-			!new_street ||
-			!new_city ||
-			!new_province ||
-			!new_country ||
-			!new_description
-		) {
-			return errorResponse(400, "ERROR", "Missing necessary fields", res);
-		}
 
 		const userIdentity = get(req, "user.identity.username");
 
@@ -166,7 +152,10 @@ export const updateCurrentUser = async (req: Request, res: Response) => {
 
 		const currentUser = await getUserByUsername(userIdentity);
 
-		const user = await updateUserByUsername(currentUser.identity.username, {
+		if (!currentUser)
+			return errorResponse(404, "NOT FOUND", "User not exist", res);
+
+		const user = await updateUserByUsername(userIdentity, {
 			identity: {
 				first_name: new_first_name,
 				last_name: new_last_name,
@@ -183,7 +172,12 @@ export const updateCurrentUser = async (req: Request, res: Response) => {
 		});
 
 		if (!user) {
-			return errorResponse(400, "ERROR", "User not found", res);
+			return errorResponse(
+				400,
+				"ERROR",
+				"User not found, update data failed",
+				res
+			);
 		}
 
 		return response(200, "SUCCESS", user, "Update username successful", res);
