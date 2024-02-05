@@ -101,9 +101,7 @@ export const Login = async (req: Request, res: Response) => {
 			username: user.identity.username,
 			email: user.identity.email,
 			role: user.identity.role,
-			sessionExpiredAt: moment()
-				.add(options.maxAge, "milliseconds")
-				.format("MMMM Do YYYY, h:mm:ss a"),
+			sessionExpiredAt: moment().add(options.maxAge, "milliseconds").format(),
 		};
 
 		return response(
