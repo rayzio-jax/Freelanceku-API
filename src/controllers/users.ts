@@ -8,48 +8,6 @@ import {
 	updateUserByUsername,
 } from "../db/users";
 
-export const getAllUserBio = async (req: Request, res: Response) => {
-	try {
-		const sortByCreatedDate = (req.query?.sortByCreatedDate ?? "asc") as string;
-		let users;
-
-		if (!sortByCreatedDate) {
-			users = await getUsers(
-				{
-					"identity.first_name": 1,
-					"identity.last_name": 1,
-					"identity.description": 1,
-					"address.province": 1,
-					"address.country": 1,
-				},
-				{}
-			);
-		} else {
-			let createdAt;
-			sortByCreatedDate === "asc" ? (createdAt = 1) : (createdAt = -1);
-			users = await getUsers(
-				{
-					"identity.first_name": 1,
-					"identity.last_name": 1,
-					"address.province": 1,
-					"address.country": 1,
-					"identity.description": 1,
-				},
-				{ createdAt }
-			);
-		}
-		return response(200, "SUCCESS", users, "Get all user bio", res);
-	} catch (error) {
-		console.log(error);
-		return errorResponse(
-			400,
-			"ERROR",
-			"Failed get all user bio: Internal server error",
-			res
-		);
-	}
-};
-
 export const getCurrentUser = async (req: Request, res: Response) => {
 	try {
 		const { username } = req.params;
@@ -83,28 +41,23 @@ export const getCurrentUser = async (req: Request, res: Response) => {
 
 export const getAllUser = async (req: Request, res: Response) => {
 	try {
-		const sortByUsername = (req.query?.sortByUsername ?? "asc") as string;
 		const sortByEmail = (req.query?.sortByEmail ?? "asc") as string;
 		let users: Object;
 
-		if (
-			(sortByUsername !== "asc" && sortByUsername !== "desc") ||
-			(sortByEmail !== "asc" && sortByEmail !== "desc")
-		) {
-			users = await getUsers(
-				{ _id: 0, __v: 0, createdAt: 0, updatedAt: 0 },
-				{}
-			);
+		if (!sortByEmail || sortByEmail === "") {
+			const filter = { _id: 0, __v: 0, createdAt: 0, updatedAt: 0 };
+			users = await getUsers(filter);
 		} else {
-			let username;
-			let email;
-			sortByUsername === "asc" ? (username = 1) : (username = -1);
-			sortByEmail === "asc" ? (email = 1) : (email = -1);
+			let emailSort;
 
-			users = await getUsers(
-				{ _id: 0, __v: 0, createdAt: 0, updatedAt: 0 },
-				{ username, email }
-			);
+			sortByEmail === "asc" ? (emailSort = 1) : (emailSort = -1);
+
+			const filter = { _id: 0, __v: 0, createdAt: 0, updatedAt: 0 };
+			const sorter = {
+				"identity.email": emailSort,
+			};
+
+			users = await getUsers(filter, sorter);
 		}
 		return response(200, "SUCCESS", users, "Get all user", res);
 	} catch (error) {
@@ -120,28 +73,20 @@ export const getAllUser = async (req: Request, res: Response) => {
 
 export const getAllUsernameAndEmail = async (req: Request, res: Response) => {
 	try {
-		const sortByUsername = req.query.sortByUsername as string;
-		const sortByEmail = req.query.sortByEmail as string;
+		const sortByEmail = (req.query?.sortByEmail ?? "asc") as string;
 		let users: Object;
 
-		if (
-			(sortByUsername !== "asc" && sortByUsername !== "desc") ||
-			(sortByEmail !== "asc" && sortByEmail !== "desc")
-		) {
-			users = await getUsers(
-				{ _id: 0, "identity.username": 1, "identity.email": 1 },
-				{}
-			);
+		if (!sortByEmail || sortByEmail === "") {
+			const filter = { _id: 0, "identity.username": 1, "identity.email": 1 };
+			users = await getUsers(filter);
 		} else {
-			let username;
-			let email;
-			sortByUsername === "asc" ? (username = 1) : (username = -1);
-			sortByEmail === "asc" ? (email = 1) : (email = -1);
+			let emailSort;
+			sortByEmail === "asc" ? (emailSort = 1) : (emailSort = -1);
 
-			users = await getUsers(
-				{ _id: 0, "identity.username": 1, "identity.email": 1 },
-				{ username, email }
-			);
+			const filter = { _id: 0, "identity.username": 1, "identity.email": 1 };
+			const sorter = { "identity.email": emailSort };
+
+			users = await getUsers(filter, sorter);
 		}
 
 		return response(200, "SUCCESS", users, "Get all username and email", res);
