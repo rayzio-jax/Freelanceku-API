@@ -71,7 +71,7 @@ export const Login = async (req: Request, res: Response) => {
 		const PRIVATE_KEY = process.env.PRIVATE_KEY;
 		user.authentication.sessionToken = jwt.sign(payload, PRIVATE_KEY, {
 			algorithm: "RS256",
-			expiresIn: "7d",
+			expiresIn: "30d",
 		});
 
 		await user.save();
@@ -80,7 +80,7 @@ export const Login = async (req: Request, res: Response) => {
 		let domain: string;
 
 		if (env === "production") {
-			const url = new URL("https://freelance-api-production.up.railway.app");
+			const url = new URL(process.env.DOMAIN_URL as string);
 			domain = url.hostname;
 		} else if (env === "development") {
 			const url = new URL(`http://localhost:${port}`);
@@ -90,7 +90,7 @@ export const Login = async (req: Request, res: Response) => {
 		let options = {
 			domain: domain,
 			path: "/",
-			maxAge: 7 * 24 * 60 * 60 * 1000,
+			maxAge: 30 * 7 * 24 * 60 * 60 * 1000,
 			httpOnly: true,
 			secure: true,
 		};
@@ -133,7 +133,6 @@ export const Register = async (req: Request, res: Response) => {
 			email,
 			password,
 			phone,
-			role,
 			street,
 			city,
 			province,
@@ -141,9 +140,17 @@ export const Register = async (req: Request, res: Response) => {
 			description,
 		} = req.body;
 
+		let { role } = req.body;
+
 		if (!username || !email || !password) {
 			return errorResponse(400, "ERROR", "Missing necessary fields", res);
 		}
+
+		!role
+			? (role = "")
+			: role === (process.env.DEV_ROLE as string)
+			? (role = "r-fa00")
+			: (role = "");
 
 		const existingUser = await getUserByEmail(email);
 		if (existingUser) {
