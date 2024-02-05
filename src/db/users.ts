@@ -118,6 +118,8 @@ const UserSchema = new mongoose.Schema(
 				type: String,
 				required: true,
 				trim: true,
+				uniqe: true,
+				lowercase: true,
 				max: 20,
 				default: "user",
 			},
@@ -134,6 +136,7 @@ const UserSchema = new mongoose.Schema(
 				type: String,
 				max: 15,
 				match: /^\d{0,15}$/,
+				default: 0,
 			},
 			role: {
 				type: String,
