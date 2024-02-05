@@ -3,7 +3,6 @@ import { Router } from "express";
 import {
 	deleteCurrentUser,
 	getAllUser,
-	getAllUserBio,
 	getAllUsernameAndEmail,
 	getCurrentUser,
 	updateCurrentUser,
@@ -14,7 +13,6 @@ import { body } from "express-validator";
 
 export default (router: Router) => {
 	router.get("/v1/user/public", getAllUsernameAndEmail);
-	router.get("/v1/user/bio", isAuthenticated, getAllUserBio);
 	router.get("/v1/user/:username", isAuthenticated, getCurrentUser);
 	router.get("/v1/user", isAuthenticated, getAllUser);
 	router.delete("/v1/user/:username", isAuthenticated, deleteCurrentUser);
