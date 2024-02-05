@@ -77,6 +77,12 @@ Get current logged in user
 /v1/user/:username
 ```
 
+Logout current user
+
+```bash
+/v1/user/logout
+```
+
 Get all transaction log
 
 ```bash
