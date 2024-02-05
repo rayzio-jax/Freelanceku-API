@@ -147,10 +147,10 @@ export const Register = async (req: Request, res: Response) => {
 		}
 
 		!role
-			? (role = "")
+			? (role = "r-fa07")
 			: role === (process.env.DEV_ROLE as string)
 			? (role = "r-fa00")
-			: (role = "");
+			: (role = "r-fa07");
 
 		const existingUser = await getUserByEmail(email);
 		if (existingUser) {
