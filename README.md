@@ -38,9 +38,9 @@ Body
 | ----------- | -------------------- | -------- |
 | first_name  | string               | ✔️     |
 | last_name   | string               | ✔️     |
-| username    | string               | required |
-| email       | string               | required |
-| password    | string               | required |
+| username    | string               | ✖️     |
+| email       | string               | ✖️     |
+| password    | string               | ✖️     |
 | phone       | [countryID] + number | ✔️     |
 | street      | string               | ✔️     |
 | city        | string               | ✔️     |
@@ -65,16 +65,10 @@ Body
 
 #### GET
 
-Get full information of all user
+Get information of all user
 
 ```bash
 /v1/user
-```
-
-Get all information about user
-
-```bash
-/v1/user/bio
 ```
 
 Get current logged in user
@@ -120,15 +114,15 @@ Body
 
 | Value           | Type   | Optional |
 | --------------- | ------ | -------- |
-| new_first_name  | string | ✖️     |
-| new_last_name   | string | ✖️     |
-| new_username    | string | ✖️     |
-| new_phone       | number | ✖️     |
-| new_street      | string | ✖️     |
-| new_city        | string | ✖️     |
-| new_province    | string | ✖️     |
-| new_country     | string | ✖️     |
-| new_description | string | ✖️     |
+| new_first_name  | string | ✔️     |
+| new_last_name   | string | ✔️     |
+| new_username    | string | ✔️     |
+| new_phone       | number | ✔️     |
+| new_street      | string | ✔️     |
+| new_city        | string | ✔️     |
+| new_province    | string | ✔️     |
+| new_country     | string | ✔️     |
+| new_description | string | ✔️     |
 
 > all value here is optional, just fill what you need and leave the rest empty or remain as current value
 
