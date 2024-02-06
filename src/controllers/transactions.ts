@@ -6,10 +6,62 @@ import {
 	getTransactions,
 	createTransaction,
 	getTransactionByPaymentId,
+	updateStatusById,
 } from "../db/users";
 
-export const updateTransaction = async (req: Request, res: Response) => {
+export const updateTransactionStatusById = async (
+	req: Request,
+	res: Response
+) => {
 	try {
+		const { _id } = req.params;
+		const { new_status } = req.body;
+
+		const paymentID = await getTransactionByPaymentId(_id);
+		if (!paymentID)
+			return errorResponse(404, "NOT FOUND", "Transaction not exist", res);
+
+		const status = updateStatusById(_id, new_status);
+
+		return response(
+			200,
+			"SUCCESS",
+			status,
+			"Update transaction status by id success",
+			res
+		);
+	} catch (error) {
+		console.log(error);
+		return errorResponse(
+			400,
+			"ERROR",
+			"Failed update transaction: Internal server error",
+			res
+		);
+	}
+};
+
+export const updateTransactionStatusByPaymentId = async (
+	req: Request,
+	res: Response
+) => {
+	try {
+		const { payment_id } = req.params;
+		const { new_status } = req.body;
+
+		const paymentID = await getTransactionByPaymentId(payment_id);
+		if (!paymentID)
+			return errorResponse(404, "NOT FOUND", "Transaction not exist", res);
+
+		const status = updateStatusById(paymentID._id, new_status);
+
+		return response(
+			200,
+			"SUCCESS",
+			status,
+			"Update transaction status payment id success",
+			res
+		);
 	} catch (error) {
 		console.log(error);
 		return errorResponse(
