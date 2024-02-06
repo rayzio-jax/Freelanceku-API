@@ -46,6 +46,14 @@ export const createNewTransaction = async (req: Request, res: Response) => {
 		if (!receiver)
 			return errorResponse(400, "ERROR", "Receiver credentials not exist", res);
 
+		if (receiver.identity.email === senderEmail)
+			return errorResponse(
+				400,
+				"ERROR",
+				"Can not send transaction to yourself",
+				res
+			);
+
 		if (!payment_id)
 			return errorResponse(400, "ERROR", "Payment credentials not exist", res);
 
