@@ -21,7 +21,7 @@ Example, if you building a platform XYZ and you need data about freelancers, you
 Get all user as a public
 
 ```bash
-/v1/user/public
+/v1/users/public
 ```
 
 #### POST
@@ -68,7 +68,7 @@ Body
 Get information of all user
 
 ```bash
-/v1/user
+/v1/users
 ```
 
 Get current logged in user
@@ -86,7 +86,7 @@ Logout current user
 Get all transaction log
 
 ```bash
-/v1/transaction
+/v1/transactions
 ```
 
 #### POST
@@ -131,6 +131,26 @@ Body
 | new_description | string | ✔️     |
 
 > all value here is optional, just fill what you need and leave the rest empty or remain as current value
+
+Update transaction status
+
+* By ID
+
+  ```bash
+  /v1/transaction/id/:id
+  ```
+
+* By payment ID
+
+  ```bash
+  /v1/transaction/payment_id/:payment_id
+  ```
+
+| Value           | Type   | Optional |
+| --------------- | ------ | -------- |
+| new_status  | string | ✖️     |
+> new status must be one of:
+>[ UNPROCESSED, FAILED, PENDING, DONE ]
 
 #### DELETE
 
