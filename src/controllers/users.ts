@@ -45,14 +45,14 @@ export const getAllUser = async (req: Request, res: Response) => {
 		let users: Object;
 
 		if (!sortByEmail || sortByEmail === "") {
-			const filter = { _id: 0, __v: 0, createdAt: 0, updatedAt: 0 };
+			const filter = { __v: 0, createdAt: 0, updatedAt: 0 };
 			users = await getUsers(filter);
 		} else {
 			let emailSort;
 
 			sortByEmail === "asc" ? (emailSort = 1) : (emailSort = -1);
 
-			const filter = { _id: 0, __v: 0, createdAt: 0, updatedAt: 0 };
+			const filter = { __v: 0, createdAt: 0, updatedAt: 0 };
 			const sorter = {
 				"identity.email": emailSort,
 			};
