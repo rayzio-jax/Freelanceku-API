@@ -7,6 +7,7 @@ import {
 	createTransaction,
 	getTransactionByPaymentId,
 	updateStatusById,
+	getTransactionById,
 } from "../db/users";
 
 export const updateTransactionStatusById = async (
@@ -17,11 +18,11 @@ export const updateTransactionStatusById = async (
 		const { _id } = req.params;
 		const { new_status } = req.body;
 
-		const paymentID = await getTransactionByPaymentId(_id);
-		if (!paymentID)
+		const transaction = await getTransactionById(_id);
+		if (!transaction)
 			return errorResponse(404, "NOT FOUND", "Transaction not exist", res);
 
-		const status = updateStatusById(_id, new_status);
+		const status = await updateStatusById(_id, new_status);
 
 		return response(
 			200,
@@ -49,11 +50,11 @@ export const updateTransactionStatusByPaymentId = async (
 		const { payment_id } = req.params;
 		const { new_status } = req.body;
 
-		const paymentID = await getTransactionByPaymentId(payment_id);
-		if (!paymentID)
+		const transaction = await getTransactionByPaymentId(payment_id);
+		if (!transaction)
 			return errorResponse(404, "NOT FOUND", "Transaction not exist", res);
 
-		const status = updateStatusById(paymentID._id, new_status);
+		const status = await updateStatusById(transaction._id, new_status);
 
 		return response(
 			200,
