@@ -80,7 +80,7 @@ export const Login = async (req: Request, res: Response) => {
 		let domain: string;
 
 		if (env === "production") {
-			const url = new URL(process.env.DOMAIN_URL as string);
+			const url = new URL(process.env.API_URL as string);
 			domain = url.hostname;
 		} else if (env === "development") {
 			const url = new URL(`http://localhost:${port}`);
@@ -101,7 +101,9 @@ export const Login = async (req: Request, res: Response) => {
 			username: user.identity.username,
 			email: user.identity.email,
 			role: user.identity.role,
-			sessionExpiredAt: moment().add(options.maxAge, "milliseconds").format(),
+			sessionExpiredAt: moment()
+				.add(options.maxAge, "milliseconds")
+				.format("YYYY-MM-DDTHH:mm:ss.SSS[Z]"),
 		};
 
 		return response(
