@@ -70,7 +70,7 @@ export const createNewTransaction = async (req: Request, res: Response) => {
 			200,
 			"SUCCESS",
 			transaction,
-			"New freelancer transaction",
+			"Success creating new transaction log",
 			res
 		);
 	} catch (error) {
