@@ -38,6 +38,6 @@
 		"lodash": "^4.17.21",
 		"moment": "^2.29.4",
 		"mongoose": "^8.0.1",
-		"nodemailer": "^6.9.7"
+		"nodemailer": "^6.9.9"
 	}
 }
