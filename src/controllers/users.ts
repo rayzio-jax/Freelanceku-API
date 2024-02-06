@@ -146,14 +146,21 @@ export const updateCurrentUser = async (req: Request, res: Response) => {
 		} = req.body;
 
 		const userIdentity = get(req, "user.identity.username");
-
 		if (username !== userIdentity)
 			return errorResponse(401, "UNAUTHORIZE", "Invalid user identity", res);
 
 		const currentUser = await getUserByUsername(userIdentity);
-
 		if (!currentUser)
 			return errorResponse(404, "NOT FOUND", "User not exist", res);
+
+		const existingUser = await getUserByUsername(new_username);
+		if (existingUser)
+			return errorResponse(
+				400,
+				"ERROR",
+				"User with this username existed",
+				res
+			);
 
 		const user = await updateUserByUsername(userIdentity, {
 			identity: {
