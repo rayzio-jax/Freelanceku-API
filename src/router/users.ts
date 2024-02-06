@@ -9,15 +9,25 @@ import {
 } from "../controllers/users";
 import Validate from "../middlewares/validate";
 import { isAuthenticated } from "../middlewares";
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 
 export default (router: Router) => {
-	router.get("/v1/user/public", getAllUsernameAndEmail);
-	router.get("/v1/user/:username", isAuthenticated, getCurrentUser);
-	router.get("/v1/user", isAuthenticated, getAllUser);
+	router.get("/v1/users/public", getAllUsernameAndEmail);
+	router.get(
+		"/v1/user/:username",
+		param("username")
+			.notEmpty()
+			.withMessage("Username is required as url parameter"),
+		isAuthenticated,
+		getCurrentUser
+	);
+	router.get("/v1/users", isAuthenticated, getAllUser);
 	router.delete("/v1/user/:username", isAuthenticated, deleteCurrentUser);
 	router.patch(
 		"/v1/user/:username",
+		param("username")
+			.notEmpty()
+			.withMessage("Username is required as url parameter"),
 		body("new_first_name")
 			.optional({ values: "falsy" })
 			.isLength({ max: 30 })
