@@ -4,12 +4,25 @@ export const response = (
 	status: string,
 	data: {},
 	message: string,
-	res: Response
+	res: Response,
+	count?: number,
+	size?: number,
+	page?: number,
+	sortBy?: string,
+	sortOrder?: string
 ) => {
+	const countPages = count ? Math.ceil(count / size) : null;
+	let totalPages;
+
+	countPages === null ? totalPages : (totalPages = countPages);
 	res.status(statusCode).json({
 		status,
 		message,
 		data: data,
+		totalPages,
+		currentPage: page,
+		sortBy,
+		sortOrder,
 	});
 };
 
