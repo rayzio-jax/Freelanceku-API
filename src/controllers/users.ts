@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { get } from "lodash";
 import { response, errorResponse } from "../response";
 import {
+	countUsers,
 	deleteUserByUsername,
 	getUserByUsername,
 	getUsers,
@@ -41,25 +42,55 @@ export const getCurrentUser = async (req: Request, res: Response) => {
 
 export const getAllUser = async (req: Request, res: Response) => {
 	try {
-		const sortByEmail = (req.query?.sortByEmail ?? "asc") as string;
+		let size = parseInt(req.query.size as string);
+		let page = parseInt(req.query.page as string);
+		const { sortBy, sortOrder } = req.query;
+		let sorter: string;
+		let sorting: {};
+		let order: number;
+		let orderText: string;
 		let users: Object;
 
-		if (!sortByEmail || sortByEmail === "") {
-			const filter = { __v: 0, createdAt: 0, updatedAt: 0 };
-			users = await getUsers(filter);
-		} else {
-			let emailSort;
+		sortOrder === "desc" ? (order = -1) : (order = 1);
 
-			sortByEmail === "asc" ? (emailSort = 1) : (emailSort = -1);
+		sortBy === "username"
+			? (sorter = "username")
+			: sortBy === "email"
+			? (sorter = "email")
+			: (sorter = "email");
 
-			const filter = { __v: 0, createdAt: 0, updatedAt: 0 };
-			const sorter = {
-				"identity.email": emailSort,
+		if (sorter === "username") {
+			sorting = {
+				"identity.username": order,
 			};
-
-			users = await getUsers(filter, sorter);
+		} else {
+			sorting = {
+				"identity.email": order,
+			};
 		}
-		return response(200, "SUCCESS", users, "Get all user", res);
+
+		order === 1 ? (orderText = "asc") : (orderText = "desc");
+		const filter = { __v: 0 };
+		const count = await countUsers();
+
+		if (!sortOrder || sortOrder === "") {
+			users = await getUsers(size, page, filter, sorting);
+		} else {
+			users = await getUsers(size, page, filter, sorting);
+		}
+
+		return response(
+			200,
+			"SUCCESS",
+			users,
+			"Get all user",
+			res,
+			count,
+			size,
+			page,
+			sortBy as string,
+			orderText
+		);
 	} catch (error) {
 		console.log(error);
 		return errorResponse(
@@ -73,23 +104,54 @@ export const getAllUser = async (req: Request, res: Response) => {
 
 export const getAllUsernameAndEmail = async (req: Request, res: Response) => {
 	try {
-		const sortByEmail = (req.query?.sortByEmail ?? "asc") as string;
+		let size = parseInt(req.query.size as string);
+		let page = parseInt(req.query.page as string);
+		const { sortBy, sortOrder } = req.query;
+		let sorter: string;
+		let sorting: {};
+		let order: number;
+		let orderText: string;
 		let users: Object;
 
-		if (!sortByEmail || sortByEmail === "") {
-			const filter = { _id: 0, "identity.username": 1, "identity.email": 1 };
-			users = await getUsers(filter);
+		sortOrder === "desc" ? (order = -1) : (order = 1);
+		sortBy === "username"
+			? (sorter = "username")
+			: sortBy === "email"
+			? (sorter = "email")
+			: (sorter = "email");
+
+		if (sorter === "username") {
+			sorting = {
+				"identity.username": order,
+			};
 		} else {
-			let emailSort;
-			sortByEmail === "asc" ? (emailSort = 1) : (emailSort = -1);
-
-			const filter = { _id: 0, "identity.username": 1, "identity.email": 1 };
-			const sorter = { "identity.email": emailSort };
-
-			users = await getUsers(filter, sorter);
+			sorting = {
+				"identity.email": order,
+			};
 		}
 
-		return response(200, "SUCCESS", users, "Get all username and email", res);
+		order === 1 ? (orderText = "asc") : (orderText = "desc");
+		const filter = { _id: 0, "identity.username": 1, "identity.email": 1 };
+		const count = await countUsers();
+
+		if (!sortOrder || sortOrder === "") {
+			users = await getUsers(size, page, filter, sorting);
+		} else {
+			users = await getUsers(size, page, filter, sorting);
+		}
+
+		return response(
+			200,
+			"SUCCESS",
+			users,
+			"Get all username and email",
+			res,
+			count,
+			size,
+			page,
+			sortBy as string,
+			orderText
+		);
 	} catch (error) {
 		console.log(error);
 		return errorResponse(

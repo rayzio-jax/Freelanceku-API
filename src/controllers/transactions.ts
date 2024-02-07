@@ -8,6 +8,7 @@ import {
 	getTransactionByPaymentId,
 	updateStatusById,
 	getTransactionById,
+	countTransactions,
 } from "../db/users";
 
 export const updateTransactionStatusById = async (
@@ -139,19 +140,53 @@ export const createNewTransaction = async (req: Request, res: Response) => {
 
 export const getAllTransaction = async (req: Request, res: Response) => {
 	try {
-		const sortByAmount = req?.query?.sortByAmount as string;
+		let size = parseInt(req.query.size as string);
+		let page = parseInt(req.query.page as string);
+		const { sortBy, sortOrder } = req.query;
+		let sorter: string;
+		let sorting: {};
+		let order: number;
+		let orderText: string;
 		let transactions: Object;
 
-		if (!sortByAmount) {
-			transactions = await getTransactions();
-		} else {
-			let amount;
-			sortByAmount === "asc" ? (amount = 1) : (amount = -1);
+		sortOrder === "desc" ? (order = -1) : (order = 1);
+		sortBy === "amount"
+			? (sorter = "amount")
+			: sortBy === "status"
+			? (sorter = "status")
+			: (sorter = "status");
 
-			transactions = await getTransactions({ amount });
+		if (sorter === "amount") {
+			sorting = {
+				amount: order,
+			};
+		} else {
+			sorting = {
+				status: order,
+			};
 		}
 
-		return response(200, "SUCCESS", transactions, "Get all transaction", res);
+		order === 1 ? (orderText = "asc") : (orderText = "desc");
+		const count = await countTransactions();
+
+		if (!sortOrder || sortOrder === "") {
+			transactions = await getTransactions(size, page, sorting);
+		} else {
+			transactions = await getTransactions(size, page, sorting);
+		}
+
+		return response(
+			200,
+			"SUCCESS",
+			transactions,
+			"Get all transaction",
+			res,
+			count,
+			size,
+			page,
+			sortBy as string,
+			orderText
+		);
 	} catch (error) {
 		console.log(error);
 		return errorResponse(
