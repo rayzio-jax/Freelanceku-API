@@ -14,6 +14,15 @@ Example, if you building a platform XYZ and you need data about freelancers, you
 
 * api-key: YOUR_API_KEY
 
+### Query On Every GET Request
+
+| Key       | Type   | Value                                                              |
+| --------- | ------ | ------------------------------------------------------------------ |
+| size      | number | MAX_DATA_IN_PAGE                                                   |
+| page      | number | CURRENT_PAGE                                                       |
+| sortBy    | string | user: ["username","email"]<br />transaction: ["amount", "status"]" |
+| sortOrder | string | ["asc", "desc"]                                                    |
+
 ### Public endpoint
 
 #### GET
@@ -146,11 +155,12 @@ Update transaction status
   /v1/transaction/payment_id/:payment_id
   ```
 
-| Value           | Type   | Optional |
-| --------------- | ------ | -------- |
-| new_status  | string | ✖️     |
+| Value      | Type   | Optional |
+| ---------- | ------ | -------- |
+| new_status | string | ✖️     |
+
 > new status must be one of:
->[ UNPROCESSED, FAILED, PENDING, DONE ]
+> [ UNPROCESSED, FAILED, PENDING, DONE ]
 
 #### DELETE
 
