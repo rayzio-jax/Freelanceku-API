@@ -8,7 +8,7 @@ import {
 } from "../controllers/transactions";
 import Validate from "../middlewares/validate";
 import { isAuthenticated } from "../middlewares";
-import { body, param } from "express-validator";
+import { body, param, query } from "express-validator";
 
 export default (router: Router) => {
 	router.patch(
@@ -22,6 +22,7 @@ export default (router: Router) => {
 			.withMessage("New status must be string")
 			.notEmpty()
 			.withMessage("Transaction new status is required"),
+		Validate,
 		isAuthenticated,
 		updateTransactionStatusById
 	);
@@ -38,10 +39,18 @@ export default (router: Router) => {
 			.withMessage("New status must be string")
 			.notEmpty()
 			.withMessage("Transaction new status is required"),
+		Validate,
 		isAuthenticated,
 		updateTransactionStatusByPaymentId
 	);
-	router.get("/v1/transactions", isAuthenticated, getAllTransaction);
+	router.get(
+		"/v1/transactions",
+		query("size").notEmpty().withMessage("Size is required"),
+		query("page").notEmpty().withMessage("Page is required"),
+		Validate,
+		isAuthenticated,
+		getAllTransaction
+	);
 	router.post(
 		"/v1/transaction/new",
 		body("payment_id").notEmpty().withMessage("Payment ID is missing"),
