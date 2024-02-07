@@ -43,14 +43,12 @@ const TransactionSchema = new mongoose.Schema(
 
 export const Transaction = mongoose.model("transactions", TransactionSchema);
 
-export const updateStatusById = async (_id: string, new_status: string) =>
-	Transaction.findByIdAndUpdate(
-		{ _id },
-		{ status: new_status },
-		{
-			new: true,
-		}
-	)
+// count documents
+export const countTransactions = () => Transaction.countDocuments();
+
+// bulk search
+export const getTransactions = (size: number, page: number, sorter?: {}) =>
+	Transaction.find({}, { __v: 0, createdAt: 0 })
 		?.populate(
 			"sender",
 			"identity.first_name identity.last_name identity.email"
@@ -58,22 +56,15 @@ export const updateStatusById = async (_id: string, new_status: string) =>
 		?.populate(
 			"receiver",
 			"identity.first_name identity.last_name identity.email"
-		);
+		)
+		?.sort(sorter)
+		.limit(size * 1)
+		.skip((page - 1) * size)
+		.exec();
 
+// single search
 export const getTransactionById = (_id: string, sorter?: {}) =>
 	Transaction.findOne({ _id }, { __v: 0, createdAt: 0 })
-		?.populate(
-			"sender",
-			"identity.first_name identity.last_name identity.email"
-		)
-		?.populate(
-			"receiver",
-			"identity.first_name identity.last_name identity.email"
-		)
-		?.sort(sorter);
-
-export const getTransactions = (sorter?: {}) =>
-	Transaction.find({}, { __v: 0, createdAt: 0 })
 		?.populate(
 			"sender",
 			"identity.first_name identity.last_name identity.email"
@@ -95,6 +86,7 @@ export const getTransactionByPaymentId = (payment_id: string) =>
 			"identity.first_name identity.last_name identity.email"
 		);
 
+// create new transaction
 export const createTransaction = async (values: Record<string, any>) => {
 	const sender = await User.findById(values.sender);
 	const receiver = await User.findById(values.receiver);
@@ -115,7 +107,9 @@ export const createTransaction = async (values: Record<string, any>) => {
 	await receiver.save();
 
 	// Populate the sender and receiver fields
-	const populatedTransaction = await Transaction.findById(transaction._id)
+	const populatedTransaction = await Transaction.findById(transaction._id, {
+		__v: 0,
+	})
 		?.populate(
 			"sender",
 			"identity.first_name identity.last_name identity.email"
@@ -127,6 +121,24 @@ export const createTransaction = async (values: Record<string, any>) => {
 
 	return populatedTransaction.toObject();
 };
+
+// update transaction status
+export const updateStatusById = async (_id: string, new_status: string) =>
+	Transaction.findByIdAndUpdate(
+		{ _id },
+		{ status: new_status },
+		{
+			new: true,
+		}
+	)
+		?.populate(
+			"sender",
+			"identity.first_name identity.last_name identity.email"
+		)
+		?.populate(
+			"receiver",
+			"identity.first_name identity.last_name identity.email"
+		);
 
 const UserSchema = new mongoose.Schema(
 	{
@@ -239,9 +251,23 @@ UserSchema.pre("save", async function (next) {
 
 export const User = mongoose.model("User", UserSchema);
 
-export const getUsers = (filter?: Object, sorter?: {}) =>
-	User.find({}, filter).sort(sorter);
+// count documents
+export const countUsers = () => User.countDocuments();
 
+// bulk search
+export const getUsers = (
+	size: number,
+	page: number,
+	filter?: Object,
+	sorter?: {}
+) =>
+	User.find({}, filter)
+		.sort(sorter)
+		.limit(size * 1)
+		.skip((page - 1) * size)
+		.exec();
+
+// single search
 export const getUserById = (_id: string) => User.findOne({ _id });
 
 export const getUserByEmail = (email: string) =>
@@ -253,12 +279,15 @@ export const getUserByUsername = (username: string) =>
 export const getUserBySession = (sessionToken: string) =>
 	User.findOne({ "authentication.sessionToken": sessionToken });
 
+// create new user
 export const createUser = async (values: Record<string, any>) =>
 	await new User(values).save().then((user) => user.toObject());
 
+// delete user
 export const deleteUserByUsername = (username: string) =>
 	User.findOneAndDelete({ "identity.username": username });
 
+// update user
 export const updateUserByUsername = async (
 	username: string,
 	values: Record<string, any>
