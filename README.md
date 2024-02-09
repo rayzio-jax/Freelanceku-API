@@ -89,7 +89,7 @@ Get current logged in user
 Logout current user
 
 ```bash
-/v1/user/logout
+/v1/auth/logout
 ```
 
 Get all transaction log
