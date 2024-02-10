@@ -16,7 +16,7 @@ export const isAuthenticated = async (
 		req.headers.authorization = apiKey;
 		const authHeader = req.headers["cookie"];
 		if (!authHeader)
-			return errorResponse(404, "NOT FOUND", "Cookie not found", res);
+			return errorResponse(401, "UNAUTHORIZE", "Please log in first!", res);
 
 		const cookie = authHeader.split("=")[1];
 		const accessToken = cookie.split(";")[0];
@@ -31,7 +31,7 @@ export const isAuthenticated = async (
 		);
 
 		if (!existingUser)
-			return errorResponse(401, "UNAUTHORIZE", "Please log in first!", res);
+			return errorResponse(401, "UNAUTHORIZE", "User has not log in", res);
 
 		const PUBLIC_KEY = process.env.PUBLIC_KEY;
 		const tokenData = verifyToken(accessToken, PUBLIC_KEY, res) as {
@@ -40,11 +40,11 @@ export const isAuthenticated = async (
 			email: string;
 		};
 
-		const userId = tokenData._id;
-		const userEmail = tokenData.email;
-
 		if (!tokenData)
 			return errorResponse(400, "ERROR", "Session not found", res);
+
+		const userId = tokenData._id;
+		const userEmail = tokenData.email;
 
 		if (
 			userId !== existingUser._id.toString() ||
