@@ -2,6 +2,7 @@ import { Router } from "express";
 
 import {
 	deleteCurrentUser,
+	getAUserByUsername,
 	getAllUser,
 	getAllUsernameAndEmail,
 	getCurrentUser,
@@ -13,9 +14,16 @@ import { body, param, query } from "express-validator";
 
 export default (router: Router) => {
 	router.get(
+		"/v1/user/find",
+		query("username").notEmpty().withMessage("Username is required as query"),
+		Validate,
+		isAuthenticated,
+		getAUserByUsername
+	);
+	router.get(
 		"/v1/users/public",
-		query("size").notEmpty().withMessage("Size is required"),
-		query("page").notEmpty().withMessage("Page is required"),
+		query("size").notEmpty().withMessage("Size is required as query"),
+		query("page").notEmpty().withMessage("Page is required query"),
 		Validate,
 		getAllUsernameAndEmail
 	);
@@ -30,8 +38,8 @@ export default (router: Router) => {
 	);
 	router.get(
 		"/v1/users",
-		query("size").notEmpty().withMessage("Size is required"),
-		query("page").notEmpty().withMessage("Page is required"),
+		query("size").notEmpty().withMessage("Size is required as query"),
+		query("page").notEmpty().withMessage("Page is required as query"),
 		Validate,
 		isAuthenticated,
 		getAllUser
