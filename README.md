@@ -86,6 +86,16 @@ Get current logged in user
 /v1/user/:username
 ```
 
+Get a user information
+
+```bash
+/v1/user/find?username="USERNAME"
+```
+
+| Query    | Type   |
+| -------- | ------ |
+| username | string |
+
 Logout current user
 
 ```bash
