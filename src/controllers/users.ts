@@ -9,6 +9,25 @@ import {
 	updateUserByUsername,
 } from "../db/users";
 
+export const getAUserByUsername = async (req: Request, res: Response) => {
+	try {
+		const username = req.query.username as string;
+		const user = await getUserByUsername(username);
+
+		if (!user) return errorResponse(404, "NOT FOUND", "User not found", res);
+
+		return response(200, "SUCCESS", user, "Get user by username", res);
+	} catch (error) {
+		console.log(error);
+		return errorResponse(
+			400,
+			"ERROR",
+			"Failed get user: Internal server error",
+			res
+		);
+	}
+};
+
 export const getCurrentUser = async (req: Request, res: Response) => {
 	try {
 		const { username } = req.params;
