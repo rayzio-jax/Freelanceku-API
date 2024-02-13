@@ -17,12 +17,14 @@ export const response = (
 	countPages === null ? totalPages : (totalPages = countPages);
 	res.status(statusCode).json({
 		status,
+		data,
 		message,
-		data: data,
-		totalPages,
-		currentPage: page,
-		sortBy,
-		sortOrder,
+		meta: {
+			currentPage: page,
+			totalPages,
+			sortBy,
+			sortOrder,
+		},
 	});
 };
 
