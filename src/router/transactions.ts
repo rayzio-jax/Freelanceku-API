@@ -3,8 +3,7 @@ import { Router } from "express";
 import {
 	getAllTransaction,
 	createNewTransaction,
-	updateTransactionStatusByPaymentId,
-	updateTransactionStatusById,
+	updateTransactionStatus,
 } from "../controllers/transactions";
 import Validate from "../middlewares/validate";
 import { isAuthenticated } from "../middlewares";
@@ -12,7 +11,7 @@ import { body, param, query } from "express-validator";
 
 export default (router: Router) => {
 	router.patch(
-		"/v1/transaction/id/:_id",
+		"/v1/transaction/status/:_id",
 		param("_id").notEmpty().withMessage("Transaction ID required as parameter"),
 		body("new_status")
 			.isIn(["UNPROCESSED", "FAILED", "PENDING", "DONE"])
@@ -24,24 +23,7 @@ export default (router: Router) => {
 			.withMessage("Transaction new status is required"),
 		Validate,
 		isAuthenticated,
-		updateTransactionStatusById
-	);
-	router.patch(
-		"/v1/transaction/payment_id/:payment_id",
-		param("payment_id")
-			.notEmpty()
-			.withMessage("Transaction payment ID required as parameter"),
-		body("new_status")
-			.isIn(["UNPROCESSED", "FAILED", "PENDING", "DONE"])
-			.withMessage("Status must be one of: UNPROCESSED, FAILED, PENDING, DONE")
-			.toUpperCase()
-			.isString()
-			.withMessage("New status must be string")
-			.notEmpty()
-			.withMessage("Transaction new status is required"),
-		Validate,
-		isAuthenticated,
-		updateTransactionStatusByPaymentId
+		updateTransactionStatus
 	);
 	router.get(
 		"/v1/transactions",

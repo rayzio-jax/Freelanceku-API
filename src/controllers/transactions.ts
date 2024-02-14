@@ -11,59 +11,39 @@ import {
 	countTransactions,
 } from "../db/users";
 
-export const updateTransactionStatusById = async (
-	req: Request,
-	res: Response
-) => {
+export const updateTransactionStatus = async (req: Request, res: Response) => {
 	try {
 		const { _id } = req.params;
 		const { new_status } = req.body;
 
-		const transaction = await getTransactionById(_id);
-		if (!transaction)
-			return errorResponse(404, "NOT FOUND", "Transaction not exist", res);
+		const idTransaction = await getTransactionById(_id);
+		if (!idTransaction) {
+			const paymentIdTransaction = await getTransactionByPaymentId(_id);
 
-		const status = await updateStatusById(_id, new_status);
+			if (!paymentIdTransaction)
+				return errorResponse(404, "NOT FOUND", "Transaction not exist", res);
 
-		return response(
-			200,
-			"SUCCESS",
-			status,
-			"Update transaction status by id success",
-			res
-		);
-	} catch (error) {
-		console.log(error);
-		return errorResponse(
-			400,
-			"ERROR",
-			"Failed update transaction: Internal server error",
-			res
-		);
-	}
-};
-
-export const updateTransactionStatusByPaymentId = async (
-	req: Request,
-	res: Response
-) => {
-	try {
-		const { payment_id } = req.params;
-		const { new_status } = req.body;
-
-		const transaction = await getTransactionByPaymentId(payment_id);
-		if (!transaction)
-			return errorResponse(404, "NOT FOUND", "Transaction not exist", res);
-
-		const status = await updateStatusById(transaction._id, new_status);
-
-		return response(
-			200,
-			"SUCCESS",
-			status,
-			"Update transaction status payment id success",
-			res
-		);
+			const status = await updateStatusById(
+				paymentIdTransaction._id,
+				new_status
+			);
+			return response(
+				200,
+				"SUCCESS",
+				status,
+				"Update transaction status by payment id success",
+				res
+			);
+		} else {
+			const status = await updateStatusById(_id, new_status);
+			return response(
+				200,
+				"SUCCESS",
+				status,
+				"Update transaction status by id success",
+				res
+			);
+		}
 	} catch (error) {
 		console.log(error);
 		return errorResponse(
