@@ -151,18 +151,18 @@ Body
 
 > all value here is optional, just fill what you need and leave the rest empty or remain as current value
 
-Update transaction status
+Update transaction status by id or payment id
 
 * By ID
 
   ```bash
-  /v1/transaction/id/:id
+  /v1/transaction/status/:id
   ```
 
 * By payment ID
 
   ```bash
-  /v1/transaction/payment_id/:payment_id
+  /v1/transaction/status/:payment_id
   ```
 
 | Value      | Type   | Optional |
