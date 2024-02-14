@@ -12,7 +12,9 @@ import { body, param, query } from "express-validator";
 export default (router: Router) => {
 	router.patch(
 		"/v1/transaction/status/:_id",
-		param("_id").notEmpty().withMessage("Transaction ID required as parameter"),
+		param("_id")
+			.notEmpty()
+			.withMessage("Transaction ID or Payment ID is required as parameter"),
 		body("new_status")
 			.isIn(["UNPROCESSED", "FAILED", "PENDING", "DONE"])
 			.withMessage("Status must be one of: UNPROCESSED, FAILED, PENDING, DONE")
