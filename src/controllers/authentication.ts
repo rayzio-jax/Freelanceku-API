@@ -142,8 +142,13 @@ export const Register = async (req: Request, res: Response) => {
 
 		let { role } = req.body;
 
-		if (!username || !email || !password) {
-			return errorResponse(400, "ERROR", "Missing necessary fields", res);
+		if (!first_name || !last_name || !username || !email || !password) {
+			return errorResponse(
+				400,
+				"ERROR",
+				"Missing necessary fields {first_name, last_name, username, email, password}",
+				res
+			);
 		}
 
 		!role
