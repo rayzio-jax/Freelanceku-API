@@ -108,14 +108,8 @@ export default (router: Router) => {
 				gmail_remove_dots: false,
 			})
 			.isEmail({ host_blacklist: ["yopmail.com"] })
-			.withMessage("Invalid email address")
-			.notEmpty()
-			.withMessage("Email is missing!"),
-		body("password")
-			.isLength({ min: 8 })
-			.withMessage("Password must 8 characters long")
-			.notEmpty()
-			.withMessage("Password is missing!"),
+			.withMessage("Invalid email address"),
+		body("password").notEmpty().withMessage("Password is missing!"),
 		Validate,
 		Login
 	);
