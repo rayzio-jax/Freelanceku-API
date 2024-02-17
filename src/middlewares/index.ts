@@ -1,10 +1,37 @@
 import "dotenv/config";
 import { Request, Response, NextFunction } from "express";
-import { merge } from "lodash";
+import { get, merge } from "lodash";
 import { errorResponse } from "../response";
 import { getUserBySession } from "../db/users";
 import { verifyToken } from "../helpers";
 import { Blacklist } from "../db/blacklists";
+
+export const isAdmin = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+) => {
+	try {
+		const admin = get(req, "user.identity.role");
+		if (!admin)
+			return errorResponse(
+				401,
+				"UNAUTHORIZE",
+				"Access restricted, administrator only!",
+				res
+			);
+
+		next();
+	} catch (error) {
+		console.log(error);
+		return errorResponse(
+			400,
+			"ERROR",
+			"Server error: Failed to authenticate",
+			res
+		);
+	}
+};
 
 export const isAuthenticated = async (
 	req: Request,
@@ -27,7 +54,7 @@ export const isAuthenticated = async (
 			return errorResponse(400, "ERROR", "Session has expired", res);
 
 		const existingUser = await getUserBySession(accessToken).select(
-			"_id identity.username identity.email authentication.key"
+			"_id identity.username identity.email identity.role authentication.key"
 		);
 
 		if (!existingUser)

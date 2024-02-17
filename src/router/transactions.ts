@@ -6,7 +6,7 @@ import {
 	updateTransactionStatus,
 } from "../controllers/transactions";
 import Validate from "../middlewares/validate";
-import { isAuthenticated } from "../middlewares";
+import { isAdmin, isAuthenticated } from "../middlewares";
 import { body, param, query } from "express-validator";
 
 export default (router: Router) => {
@@ -33,6 +33,7 @@ export default (router: Router) => {
 		query("page").notEmpty().withMessage("Page is required"),
 		Validate,
 		isAuthenticated,
+		isAdmin,
 		getAllTransaction
 	);
 	router.post(
