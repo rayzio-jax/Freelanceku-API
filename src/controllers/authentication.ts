@@ -97,7 +97,7 @@ export const Login = async (req: Request, res: Response) => {
 
 		res.cookie("token", user.authentication.sessionToken, {
 			...options,
-			sameSite: "none",
+			sameSite: "lax",
 		});
 
 		const savedUser = {
