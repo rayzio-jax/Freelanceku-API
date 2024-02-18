@@ -87,16 +87,18 @@ export const Login = async (req: Request, res: Response) => {
 			domain = url.hostname;
 		}
 
-		let options = {
+		const options = {
 			domain: domain,
 			path: "/",
 			maxAge: 30 * 7 * 24 * 60 * 60 * 1000,
 			httpOnly: true,
 			secure: true,
-			sameSite: false,
 		};
 
-		res.cookie("SessionID", user.authentication.sessionToken, options);
+		res.cookie("SessionID", user.authentication.sessionToken, {
+			...options,
+			sameSite: "lax",
+		});
 
 		const savedUser = {
 			username: user.identity.username,
