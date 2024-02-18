@@ -91,7 +91,7 @@ export const Login = async (req: Request, res: Response) => {
 			domain: domain,
 			path: "/",
 			maxAge: 30 * 7 * 24 * 60 * 60 * 1000,
-			httpOnly: true,
+			httpOnly: false,
 			secure: true,
 		};
 
