@@ -95,7 +95,7 @@ export const Login = async (req: Request, res: Response) => {
 			secure: true,
 		};
 
-		res.cookie("SessionID", user.authentication.sessionToken, {
+		res.cookie("token", user.authentication.sessionToken, {
 			...options,
 			sameSite: "lax",
 		});
