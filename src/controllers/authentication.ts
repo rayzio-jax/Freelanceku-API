@@ -91,8 +91,8 @@ export const Login = async (req: Request, res: Response) => {
 			domain: domain,
 			path: "/",
 			maxAge: 30 * 7 * 24 * 60 * 60 * 1000,
-			httpOnly: false,
-			secure: false,
+			httpOnly: true,
+			secure: true,
 		};
 
 		res.cookie("token", user.authentication.sessionToken, {
