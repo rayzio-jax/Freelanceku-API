@@ -42,7 +42,7 @@ export const Login = async (req: Request, res: Response) => {
 		const { email, password } = req.body;
 
 		if (!email || !password) {
-			return errorResponse(400, "INVALID", "Invalid email or password", res);
+			return errorResponse(400, "ERROR", "Wrong email or password!", res);
 		}
 
 		const user = await getUserByEmail(email).select(
@@ -59,7 +59,7 @@ export const Login = async (req: Request, res: Response) => {
 		);
 
 		if (!expectedHash) {
-			return errorResponse(403, "FORBIDDEN", "Invalid password", res);
+			return errorResponse(400, "ERROR", "Wrong email or password!", res);
 		}
 
 		const payload = {
@@ -160,7 +160,7 @@ export const Register = async (req: Request, res: Response) => {
 
 		const existingUser = await getUserByEmail(email);
 		if (existingUser) {
-			return errorResponse(400, "INVALID", "User existed", res);
+			return errorResponse(400, "ERROR", "User has registered!", res);
 		}
 
 		const user = await createUser({
