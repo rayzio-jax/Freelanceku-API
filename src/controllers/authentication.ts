@@ -93,11 +93,12 @@ export const Login = async (req: Request, res: Response) => {
 			maxAge: 30 * 7 * 24 * 60 * 60 * 1000,
 			httpOnly: true,
 			secure: true,
+			signed: true,
 		};
 
 		res.cookie("token", user.authentication.sessionToken, {
 			...options,
-			sameSite: "lax",
+			sameSite: "none",
 		});
 
 		const savedUser = {
