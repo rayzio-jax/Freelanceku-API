@@ -235,13 +235,14 @@ export const updateCurrentUser = async (req: Request, res: Response) => {
 			return errorResponse(404, "NOT FOUND", "User not exist", res);
 
 		const existingUser = await getUserByUsername(new_username);
-		if (existingUser)
+		if (existingUser && new_username !== username) {
 			return errorResponse(
 				400,
 				"ERROR",
 				"User with this username existed",
 				res
 			);
+		}
 
 		const user = await updateUserByUsername(userIdentity, {
 			identity: {
