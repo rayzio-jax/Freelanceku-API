@@ -10,6 +10,8 @@ import {
 	getTransactionById,
 	countTransactions,
 	updateTransactionByPaymentId,
+	deleteTransactionById,
+	deleteTransactionByPaymentId,
 } from "../db/users";
 
 export const updateTransByIdOrPayId = async (req: Request, res: Response) => {
@@ -70,6 +72,40 @@ export const updateTransByIdOrPayId = async (req: Request, res: Response) => {
 			400,
 			"ERROR",
 			"Failed update transaction: Internal server error",
+			res
+		);
+	}
+};
+
+export const deleteTransByIdOrPaymentId = async (
+	req: Request,
+	res: Response
+) => {
+	try {
+		const { _id } = req.params;
+
+		if (!_id)
+			return errorResponse(400, "ERROR", "Invalid or missing parameter", res);
+
+		let transaction = await deleteTransactionById(_id);
+		if (!transaction) {
+			transaction = await deleteTransactionByPaymentId(_id);
+			if (!transaction)
+				return errorResponse(400, "ERROR", "Transaction not exist", res);
+		}
+
+		return response(
+			200,
+			"SUCCESS",
+			transaction,
+			"Delete transaction successful",
+			res
+		);
+	} catch (error) {
+		return errorResponse(
+			400,
+			"ERROR",
+			"Failed delete transaction: Internal server error",
 			res
 		);
 	}
@@ -164,7 +200,7 @@ export const getTransByIdOrPaymentId = async (req: Request, res: Response) => {
 		return errorResponse(
 			400,
 			"ERROR",
-			"Failed get all transaction: Internal server error",
+			"Failed get a transaction: Internal server error",
 			res
 		);
 	}
