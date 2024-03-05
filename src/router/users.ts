@@ -49,15 +49,45 @@ export default (router: Router) => {
 	router.patch(
 		"/v1/user-as-admin",
 		body("email")
+			.trim()
+			.escape()
+			.toLowerCase()
 			.normalizeEmail({
 				gmail_remove_dots: false,
 			})
 			.isEmail({ host_blacklist: ["yopmail.com"] })
 			.withMessage("Enter a valid email address"),
-		body("password").notEmpty().withMessage("Password is missing!"),
-		body("api_key").notEmpty().withMessage("API Key is missing!"),
-		body("admin_key").notEmpty().withMessage("Admin Key is missing!"),
-		body("new_role").notEmpty().withMessage("New role is missing!"),
+		body("password")
+			.trim()
+			.escape()
+			.isString()
+			.withMessage("Password must be string")
+			.notEmpty()
+			.withMessage("Password is missing!"),
+		body("api_key")
+			.trim()
+			.escape()
+			.isString()
+			.withMessage("API Key must be string")
+			.notEmpty()
+			.withMessage("API Key is missing!"),
+		body("admin_key")
+			.trim()
+			.escape()
+			.isString()
+			.withMessage("Admin Key must be string")
+			.notEmpty()
+			.withMessage("Admin Key is missing!"),
+		body("new_role")
+			.trim()
+			.escape()
+			.toLowerCase()
+			.isIn(["r-fa00", "r-fa07"])
+			.withMessage("Status must be one of: r-fa00, r-fa07")
+			.isString()
+			.withMessage("New role must be string")
+			.notEmpty()
+			.withMessage("New role is missing!"),
 		Validate,
 		isAuthenticated,
 		updateUserAsAdmin
