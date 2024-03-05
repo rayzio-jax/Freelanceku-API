@@ -157,23 +157,6 @@ Body
 
 > all value here is optional, just fill what you need and leave the rest empty or remain as current value
 
-* Update user as admin
-
-```bash
-/v1/user-as-admin
-```
-
-| Value     | Type    | Optional |
-| --------- | ------- | -------- |
-| email     | string  | ✖️     |
-| password  | string  | ✖️     |
-| api_key   | strinig | ✖️     |
-| admin_key | string  | ✖️     |
-| new_role  | string  | ✖️     |
-
-> `admin_key` is a secret key that do not share to other, only developer and stakeholder knowing it
-> (if you fork this project and deploy it yourself, you can configure your own `admin_key` in your env)
-
 * Update transaction status by id or payment id (ONLY ADMIN)
 
 ```bash
