@@ -56,11 +56,11 @@ export default (router: Router) => {
 			.notEmpty()
 			.withMessage("Transaction message is required"),
 		body("status")
+			.trim()
+			.escape()
+			.toUpperCase()
 			.isIn(["UNPROCESSED", "FAILED", "PENDING", "DONE"])
 			.withMessage("Status must be one of: UNPROCESSED, FAILED, PENDING, DONE")
-			.toUpperCase()
-			.escape()
-			.trim()
 			.notEmpty()
 			.withMessage("Status is required"),
 		Validate,
