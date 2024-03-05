@@ -217,7 +217,6 @@ export const updateCurrentUser = async (req: Request, res: Response) => {
 		const {
 			new_first_name,
 			new_last_name,
-			new_username,
 			new_phone,
 			new_description,
 			new_street,
@@ -225,6 +224,10 @@ export const updateCurrentUser = async (req: Request, res: Response) => {
 			new_province,
 			new_country,
 		} = req.body;
+
+		let { new_username } = req.body
+
+		if(!new_username) new_username = "";
 
 		const userIdentity = get(req, "user.identity.username");
 		if (username !== userIdentity)
