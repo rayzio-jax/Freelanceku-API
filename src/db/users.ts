@@ -122,15 +122,24 @@ export const createTransaction = async (values: Record<string, any>) => {
 	return populatedTransaction.toObject();
 };
 
-// update transaction status
-export const updateStatusById = async (_id: string, new_status: string) =>
-	Transaction.findByIdAndUpdate(
-		{ _id },
-		{ status: new_status },
-		{
-			new: true,
-		}
-	)
+// update transaction by id
+export const updateTransactionById = async (
+	_id: string,
+	values: Record<string, any>
+) => {
+	const transaction = await Transaction.findOne({ _id });
+	if (transaction && values) {
+		values.payment_id = values.payment_id || transaction.payment_id;
+		values.sender = values.sender || transaction.sender;
+		values.receiver = values.receiver || transaction.receiver;
+		values.amount = values.amount || transaction.amount;
+		values.message = values.message || transaction.message;
+		values.status = values.status || transaction.status;
+	}
+
+	return await Transaction.findByIdAndUpdate({ _id }, values, {
+		new: true,
+	})
 		?.populate(
 			"sender",
 			"identity.first_name identity.last_name identity.email"
@@ -139,6 +148,40 @@ export const updateStatusById = async (_id: string, new_status: string) =>
 			"receiver",
 			"identity.first_name identity.last_name identity.email"
 		);
+};
+
+export const updateTransactionByPaymentId = async (
+	payment_id: string,
+	values: Record<string, any>
+) => {
+	const transaction = await Transaction.findOne({ payment_id });
+	if (transaction && values) {
+		values.payment_id = values.payment_id || transaction.payment_id;
+		values.sender = values.sender || transaction.sender;
+		values.receiver = values.receiver || transaction.receiver;
+		values.amount = values.amount || transaction.amount;
+		values.message = values.message || transaction.message;
+		values.status = values.status || transaction.status;
+	}
+
+	return await Transaction.findByIdAndUpdate({ payment_id }, values, {
+		new: true,
+	})
+		?.populate(
+			"sender",
+			"identity.first_name identity.last_name identity.email"
+		)
+		?.populate(
+			"receiver",
+			"identity.first_name identity.last_name identity.email"
+		);
+};
+
+export const deleteTransactionById = async (_id: string) =>
+	Transaction.findOneAndDelete({ _id });
+
+export const deleteTransactionByPaymentId = async (payment_id: string) =>
+	Transaction.findOneAndDelete({ payment_id });
 
 const UserSchema = new mongoose.Schema(
 	{
