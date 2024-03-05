@@ -39,7 +39,7 @@ export const updateTransByIdOrPayId = async (req: Request, res: Response) => {
 		});
 
 		if (!updateById) {
-			const updateById = await updateTransactionByPaymentId(_id, {
+			updateById = await updateTransactionByPaymentId(_id, {
 				payment_id: new_payment_id,
 				sender: new_sender_id,
 				receiver: new_receiver_id,
@@ -133,6 +133,38 @@ export const createNewTransaction = async (req: Request, res: Response) => {
 			400,
 			"ERROR",
 			"Failed create new transaction: Internal server error",
+			res
+		);
+	}
+};
+
+export const getTransByIdOrPaymentId = async (req: Request, res: Response) => {
+	try {
+		const { _id } = req.params;
+
+		if (!_id)
+			return errorResponse(400, "ERROR", "Invalid or missing parameter", res);
+
+		let transaction = await getTransactionById(_id);
+		if (!transaction) {
+			transaction = await getTransactionByPaymentId(_id);
+			if (!transaction)
+				return errorResponse(400, "ERROR", "Transaction not exist", res);
+		}
+
+		return response(
+			200,
+			"SUCCESS",
+			transaction,
+			"Find transaction successful",
+			res
+		);
+	} catch (error) {
+		console.log(error);
+		return errorResponse(
+			400,
+			"ERROR",
+			"Failed get all transaction: Internal server error",
 			res
 		);
 	}
