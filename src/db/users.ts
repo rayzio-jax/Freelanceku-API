@@ -344,7 +344,7 @@ export const updateUserByUsername = async (
 			values.identity.first_name || user.identity.first_name;
 		values.identity.last_name =
 			values.identity.last_name || user.identity.last_name;
-		values.identity.username = values.identity.username !== null ? values.identity.username : user.identity.username;
+		values.identity.username = values.identity.username || user.identity.username;
 		values.identity.email = values.identity.email || user.identity.email;
 		values.identity.phone = values.identity.phone || user.identity.phone;
 		values.identity.role = values.identity.role || user.identity.role;
@@ -379,7 +379,7 @@ export const updateUserByEmail = async (
 			values.identity.first_name || user.identity.first_name;
 		values.identity.last_name =
 			values.identity.last_name || user.identity.last_name;
-		values.identity.username = values.identity.username !== null ? values.identity.username : user.identity.username;
+		values.identity.username = values.identity.username || user.identity.username;
 		values.identity.email = values.identity.email || user.identity.email;
 		values.identity.phone = values.identity.phone || user.identity.phone;
 		values.identity.role = values.identity.role || user.identity.role;
