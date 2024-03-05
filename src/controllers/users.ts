@@ -1,15 +1,12 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import { get } from "lodash";
-import bcrypt from "bcrypt";
 import { response, errorResponse } from "../response";
 import {
 	countUsers,
+	deleteUserByUsername,
 	getUserByUsername,
-	getUserByEmail,
 	getUsers,
 	updateUserByUsername,
-	updateUserByEmail,
-	deleteUserByUsername,
 } from "../db/users";
 
 export const getAUserByUsername = async (req: Request, res: Response) => {
@@ -214,66 +211,6 @@ export const deleteCurrentUser = async (req: Request, res: Response) => {
 	}
 };
 
-export const updateUserAsAdmin = async (req: Request, res: Response) => {
-	try {
-		const { email, password, api_key, admin_key, new_role } = req.body;
-
-		if (!email || !password || !new_role || !api_key || !admin_key)
-			return errorResponse(400, "ERROR", "Missing necessary fields", res);
-
-		const user = await getUserByEmail(email).select(
-			"+authentication.password +authentication.key"
-		);
-		if (!user) return errorResponse(404, "NOT FOUND", "User not exist", res);
-
-		const expectedHash = await bcrypt.compare(
-			password,
-			user.authentication.password
-		);
-		if (!expectedHash)
-			return errorResponse(400, "ERROR", "Wrong email or password!", res);
-
-		if (api_key !== user.authentication.key)
-			return errorResponse(400, "ERROR", "Wrong API Key", res);
-
-		const adminKey = process.env.DEV_ROLE;
-		if (admin_key !== adminKey)
-			return errorResponse(
-				400,
-				"ERROR",
-				"You are not eligible for this role",
-				res
-			);
-
-		const target_role = ["r-fa00", "r-fa07"];
-
-		if (!target_role.includes(new_role))
-			return errorResponse(400, "ERROR", "Unidentified role: Failed", res);
-
-		const updatedUser = await updateUserByEmail(email, {
-			identity: {
-				role: new_role,
-			},
-		});
-
-		return response(
-			200,
-			"SUCCESS",
-			updatedUser,
-			"Update user as admin success",
-			res
-		);
-	} catch (error) {
-		console.log(error);
-		return errorResponse(
-			400,
-			"ERROR",
-			"Failed updating data: Internal server error",
-			res
-		);
-	}
-};
-
 export const updateCurrentUser = async (req: Request, res: Response) => {
 	try {
 		const { username } = req.params;
@@ -298,14 +235,13 @@ export const updateCurrentUser = async (req: Request, res: Response) => {
 			return errorResponse(404, "NOT FOUND", "User not exist", res);
 
 		const existingUser = await getUserByUsername(new_username);
-		if (existingUser && new_username !== username) {
+		if (existingUser)
 			return errorResponse(
 				400,
 				"ERROR",
 				"User with this username existed",
 				res
 			);
-		}
 
 		const user = await updateUserByUsername(userIdentity, {
 			identity: {
