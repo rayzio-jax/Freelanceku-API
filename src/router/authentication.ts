@@ -29,6 +29,9 @@ export default (router: Router) => {
 			.notEmpty()
 			.withMessage("Username is required"),
 		body("email")
+			.trim()
+			.escape()
+			.toLowerCase()
 			.normalizeEmail({
 				gmail_remove_dots: false,
 			})
@@ -104,6 +107,9 @@ export default (router: Router) => {
 	router.post(
 		"/v1/auth/login",
 		body("email")
+			.trim()
+			.escape()
+			.toLowerCase()
 			.normalizeEmail({
 				gmail_remove_dots: false,
 			})
