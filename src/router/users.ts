@@ -7,6 +7,7 @@ import {
 	getAllUsernameAndEmail,
 	getCurrentUser,
 	updateCurrentUser,
+	updateUserAsAdmin,
 } from "../controllers/users";
 import Validate from "../middlewares/validate";
 import { isAuthenticated } from "../middlewares";
@@ -22,8 +23,8 @@ export default (router: Router) => {
 	);
 	router.get(
 		"/v1/users/public",
-		query("size").notEmpty().withMessage("Size is required as query"),
-		query("page").notEmpty().withMessage("Page is required query"),
+		query("size").notEmpty().withMessage("Param 'size' is required"),
+		query("page").notEmpty().withMessage("Param 'page' is required"),
 		Validate,
 		getAllUsernameAndEmail
 	);
@@ -38,13 +39,59 @@ export default (router: Router) => {
 	);
 	router.get(
 		"/v1/users",
-		query("size").notEmpty().withMessage("Size is required as query"),
-		query("page").notEmpty().withMessage("Page is required as query"),
+		query("size").notEmpty().withMessage("Param 'size' is required"),
+		query("page").notEmpty().withMessage("Param 'page' is required"),
 		Validate,
 		isAuthenticated,
 		getAllUser
 	);
 	router.delete("/v1/user/:username", isAuthenticated, deleteCurrentUser);
+	router.patch(
+		"/v1/user-as-admin",
+		body("email")
+			.trim()
+			.escape()
+			.toLowerCase()
+			.normalizeEmail({
+				gmail_remove_dots: false,
+			})
+			.isEmail({ host_blacklist: ["yopmail.com"] })
+			.withMessage("Enter a valid email address"),
+		body("password")
+			.trim()
+			.escape()
+			.isString()
+			.withMessage("Password must be string")
+			.notEmpty()
+			.withMessage("Password is missing!"),
+		body("api_key")
+			.trim()
+			.escape()
+			.isString()
+			.withMessage("API Key must be string")
+			.notEmpty()
+			.withMessage("API Key is missing!"),
+		body("admin_key")
+			.trim()
+			.escape()
+			.isString()
+			.withMessage("Admin Key must be string")
+			.notEmpty()
+			.withMessage("Admin Key is missing!"),
+		body("new_role")
+			.trim()
+			.escape()
+			.toLowerCase()
+			.isIn(["r-fa00", "r-fa07"])
+			.withMessage("Status must be one of: r-fa00, r-fa07")
+			.isString()
+			.withMessage("New role must be string")
+			.notEmpty()
+			.withMessage("New role is missing!"),
+		Validate,
+		isAuthenticated,
+		updateUserAsAdmin
+	);
 	router.patch(
 		"/v1/user/:username",
 		param("username")

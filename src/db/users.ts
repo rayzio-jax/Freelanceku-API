@@ -122,15 +122,24 @@ export const createTransaction = async (values: Record<string, any>) => {
 	return populatedTransaction.toObject();
 };
 
-// update transaction status
-export const updateStatusById = async (_id: string, new_status: string) =>
-	Transaction.findByIdAndUpdate(
-		{ _id },
-		{ status: new_status },
-		{
-			new: true,
-		}
-	)
+// update transaction by id
+export const updateTransactionById = async (
+	_id: string,
+	values: Record<string, any>
+) => {
+	const transaction = await Transaction.findOne({ _id });
+	if (transaction && values) {
+		values.payment_id = values.payment_id || transaction.payment_id;
+		values.sender = values.sender || transaction.sender;
+		values.receiver = values.receiver || transaction.receiver;
+		values.amount = values.amount || transaction.amount;
+		values.message = values.message || transaction.message;
+		values.status = values.status || transaction.status;
+	}
+
+	return await Transaction.findByIdAndUpdate({ _id }, values, {
+		new: true,
+	})
 		?.populate(
 			"sender",
 			"identity.first_name identity.last_name identity.email"
@@ -139,6 +148,40 @@ export const updateStatusById = async (_id: string, new_status: string) =>
 			"receiver",
 			"identity.first_name identity.last_name identity.email"
 		);
+};
+
+export const updateTransactionByPaymentId = async (
+	payment_id: string,
+	values: Record<string, any>
+) => {
+	const transaction = await Transaction.findOne({ payment_id });
+	if (transaction && values) {
+		values.payment_id = values.payment_id || transaction.payment_id;
+		values.sender = values.sender || transaction.sender;
+		values.receiver = values.receiver || transaction.receiver;
+		values.amount = values.amount || transaction.amount;
+		values.message = values.message || transaction.message;
+		values.status = values.status || transaction.status;
+	}
+
+	return await Transaction.findByIdAndUpdate({ payment_id }, values, {
+		new: true,
+	})
+		?.populate(
+			"sender",
+			"identity.first_name identity.last_name identity.email"
+		)
+		?.populate(
+			"receiver",
+			"identity.first_name identity.last_name identity.email"
+		);
+};
+
+export const deleteTransactionById = async (_id: string) =>
+	Transaction.findOneAndDelete({ _id });
+
+export const deleteTransactionByPaymentId = async (payment_id: string) =>
+	Transaction.findOneAndDelete({ payment_id });
 
 const UserSchema = new mongoose.Schema(
 	{
@@ -158,9 +201,9 @@ const UserSchema = new mongoose.Schema(
 			username: {
 				type: String,
 				required: true,
-				trim: true,
 				uniqe: true,
 				lowercase: true,
+				trim: true,
 				max: 20,
 				default: "user",
 			},
@@ -296,53 +339,64 @@ export const updateUserByUsername = async (
 
 	// if no any identity data in values, identity data remain the same
 
-	user && !values.identity.first_name
-		? (values.identity.first_name = user.identity.first_name)
-		: null;
+	if (user && values.identity) {
+		values.identity.first_name =
+			values.identity.first_name || user.identity.first_name;
+		values.identity.last_name =
+			values.identity.last_name || user.identity.last_name;
+		values.identity.usename =
+			values.identity.username || user.identity.username;
+		values.identity.email = values.identity.email || user.identity.email;
+		values.identity.phone = values.identity.phone || user.identity.phone;
+		values.identity.role = values.identity.role || user.identity.role;
+		values.identity.description =
+			values.identity.description || user.identity.description;
+	}
 
-	user && !values.identity.last_name
-		? (values.identity.last_name = user.identity.last_name)
-		: null;
-
-	user && !values.identity.username
-		? (values.identity.username = user.identity.username)
-		: null;
-
-	user && !values.identity.email
-		? (values.identity.email = user.identity.email)
-		: null;
-
-	user && !values.identity.phone
-		? (values.identity.phone = user.identity.phone)
-		: null;
-
-	user && !values.identity.role
-		? (values.identity.role = user.identity.role)
-		: null;
-
-	user && !values.identity.description
-		? (values.identity.description = user.identity.description)
-		: null;
-
-	user && !values.address.street
-		? (values.address.street = user.address.street)
-		: null;
-
-	user && !values.address.city
-		? (values.address.city = user.address.city)
-		: null;
-
-	user && !values.address.province
-		? (values.address.province = user.address.province)
-		: null;
-
-	user && !values.address.country
-		? (values.address.country = user.address.country)
-		: null;
+	if (user && values.address) {
+		values.address.street = values.address.street || user.address.street;
+		values.address.city = values.address.city || user.address.city;
+		values.address.province = values.address.province || user.address.province;
+		values.address.country = values.address.country || user.address.country;
+	}
 
 	return await User.findOneAndUpdate(
 		{ "identity.username": username },
 		values,
 		{ new: true }
 	);
+};
+
+export const updateUserByEmail = async (
+	email: string,
+	values: Record<string, any>
+) => {
+	const user = await User.findOne({ "identity.email": email });
+
+	// if no any identity data in values, identity data remain the same
+
+	if (user && values.identity) {
+		values.identity.first_name =
+			values.identity.first_name || user.identity.first_name;
+		values.identity.last_name =
+			values.identity.last_name || user.identity.last_name;
+		values.identity.username =
+			values.identity.username || user.identity.username;
+		values.identity.email = values.identity.email || user.identity.email;
+		values.identity.phone = values.identity.phone || user.identity.phone;
+		values.identity.role = values.identity.role || user.identity.role;
+		values.identity.description =
+			values.identity.description || user.identity.description;
+	}
+
+	if (user && values.address) {
+		values.address.street = values.address.street || user.address.street;
+		values.address.city = values.address.city || user.address.city;
+		values.address.province = values.address.province || user.address.province;
+		values.address.country = values.address.country || user.address.country;
+	}
+
+	return await User.findOneAndUpdate({ "identity.email": email }, values, {
+		new: true,
+	});
 };

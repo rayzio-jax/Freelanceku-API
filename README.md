@@ -27,7 +27,7 @@ Example, if you building a platform XYZ and you need data about freelancers, you
 
 #### GET
 
-Get all user as a public
+* Get all user as a public
 
 ```bash
 /v1/users/public
@@ -35,7 +35,7 @@ Get all user as a public
 
 #### POST
 
-Register new user
+* Register new user
 
 ```bash
 /v1/auth/register
@@ -57,7 +57,7 @@ Body
 | country     | string               | ✔️     |
 | description | string               | ✔️     |
 
-Login a user
+* Login a user
 
 ```bash
 /v1/auth/login
@@ -74,19 +74,19 @@ Body
 
 #### GET
 
-Get information of all user
+* Get information of all user
 
 ```bash
 /v1/users
 ```
 
-Get current logged in user
+* Get current logged in user
 
 ```bash
 /v1/user/:username
 ```
 
-Get a user information
+* Get a user information
 
 ```bash
 /v1/user/find?username="USERNAME"
@@ -96,21 +96,27 @@ Get a user information
 | -------- | ------ |
 | username | string |
 
-Logout current user
+* Logout current user
 
 ```bash
 /v1/auth/logout
 ```
 
-Get all transaction log
+* Get all transaction log
 
 ```bash
 /v1/transactions
 ```
 
+* Get transaction log by id or payment id (ONLY ADMIN)
+
+```bash
+/v1/transaction/:_id
+```
+
 #### POST
 
-Create new transaction log
+* Create new transaction log
 
 ```bash
 /v1/transaction/new
@@ -129,7 +135,7 @@ Body
 
 #### PATCH
 
-Update user data
+* Update user data
 
 ```bash
 /v1/user/:username
@@ -151,31 +157,51 @@ Body
 
 > all value here is optional, just fill what you need and leave the rest empty or remain as current value
 
-Update transaction status by id or payment id
+* Update user as admin
 
-* By ID
+```bash
+/v1/user-as-admin
+```
 
-  ```bash
-  /v1/transaction/status/:id
-  ```
+| Value     | Type    | Optional |
+| --------- | ------- | -------- |
+| email     | string  | ✖️     |
+| password  | string  | ✖️     |
+| api_key   | strinig | ✖️     |
+| admin_key | string  | ✖️     |
+| new_role  | string  | ✖️     |
 
-* By payment ID
+> `admin_key` is a secret key that do not share to other, only developer and stakeholder knowing it
+> (if you fork this project and deploy it yourself, you can configure your own `admin_key` in your env)
 
-  ```bash
-  /v1/transaction/status/:payment_id
-  ```
+* Update transaction status by id or payment id (ONLY ADMIN)
 
-| Value      | Type   | Optional |
-| ---------- | ------ | -------- |
-| new_status | string | ✖️     |
+```bash
+/v1/transaction/:_id
+```
+
+| Value           | Type           | Optional |
+| --------------- | -------------- | -------- |
+| new_payment_id  | string         | ✔️     |
+| new_sender_id   | string         | ✔️     |
+| new_receiver_id | string         | ✔️     |
+| new_amount      | number/integer | ✔️     |
+| new_message     | string         | ✔️     |
+| new_status      | string         | ✔️     |
 
 > new status must be one of:
 > [ UNPROCESSED, FAILED, PENDING, DONE ]
 
 #### DELETE
 
-Delete user by username
+* Delete user by username
 
 ```bash
 /v1/user/:username
+```
+
+* Delete transaction by id or payment id (ONLY ADMIN)
+
+```bash
+/v1/transaction/:_id
 ```

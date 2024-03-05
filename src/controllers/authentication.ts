@@ -2,7 +2,7 @@ import "dotenv/config";
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 import { response, errorResponse } from "../response";
-import { createUser, getUserByEmail } from "../db/users";
+import { createUser, getUserByEmail, getUserByUsername } from "../db/users";
 import jwt from "jsonwebtoken";
 import moment from "moment";
 import { Blacklist } from "../db/blacklists";
@@ -57,7 +57,6 @@ export const Login = async (req: Request, res: Response) => {
 			password,
 			user.authentication.password
 		);
-
 		if (!expectedHash) {
 			return errorResponse(400, "ERROR", "Wrong email or password!", res);
 		}
@@ -143,8 +142,6 @@ export const Register = async (req: Request, res: Response) => {
 			description,
 		} = req.body;
 
-		let { role } = req.body;
-
 		if (!first_name || !last_name || !username || !email || !password) {
 			return errorResponse(
 				400,
@@ -154,16 +151,13 @@ export const Register = async (req: Request, res: Response) => {
 			);
 		}
 
-		!role
-			? (role = "r-fa07")
-			: role === (process.env.DEV_ROLE as string)
-			? (role = "r-fa00")
-			: (role = "r-fa07");
-
-		const existingUser = await getUserByEmail(email);
-		if (existingUser) {
+		const existingUserByEmail = await getUserByEmail(email);
+		if (existingUserByEmail)
 			return errorResponse(400, "ERROR", "User has registered!", res);
-		}
+
+		const existingUserByUsername = await getUserByUsername(username);
+		if (existingUserByUsername)
+			return errorResponse(400, "ERROR", "User has registered!", res);
 
 		const user = await createUser({
 			identity: {
@@ -172,7 +166,6 @@ export const Register = async (req: Request, res: Response) => {
 				username,
 				email,
 				phone,
-				role,
 				description,
 			},
 			authentication: {

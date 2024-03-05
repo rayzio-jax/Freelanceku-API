@@ -6,50 +6,106 @@ import {
 	getTransactions,
 	createTransaction,
 	getTransactionByPaymentId,
-	updateStatusById,
+	updateTransactionById,
 	getTransactionById,
 	countTransactions,
+	updateTransactionByPaymentId,
+	deleteTransactionById,
+	deleteTransactionByPaymentId,
 } from "../db/users";
 
-export const updateTransactionStatus = async (req: Request, res: Response) => {
+export const updateTransByIdOrPayId = async (req: Request, res: Response) => {
 	try {
 		const { _id } = req.params;
-		const { new_status } = req.body;
+		const {
+			new_payment_id,
+			new_sender_id,
+			new_receiver_id,
+			new_amount,
+			new_message,
+			new_status,
+		} = req.body;
 
-		const idTransaction = await getTransactionById(_id);
-		if (!idTransaction) {
-			const paymentIdTransaction = await getTransactionByPaymentId(_id);
+		const matchStatus = ["UNPROCESSED", "FAILED", "PENDING", "DONE"];
 
-			if (!paymentIdTransaction)
-				return errorResponse(404, "NOT FOUND", "Transaction not exist", res);
+		if (!matchStatus.includes(new_status))
+			return errorResponse(400, "ERROR", "Invalid transaction status", res);
 
-			const status = await updateStatusById(
-				paymentIdTransaction._id,
-				new_status
-			);
-			return response(
-				200,
-				"SUCCESS",
-				status,
-				"Update transaction status by payment id success",
-				res
-			);
-		} else {
-			const status = await updateStatusById(_id, new_status);
-			return response(
-				200,
-				"SUCCESS",
-				status,
-				"Update transaction status by id success",
-				res
-			);
+		let updateById = await updateTransactionById(_id, {
+			payment_id: new_payment_id,
+			sender: new_sender_id,
+			receiver: new_receiver_id,
+			amount: new_amount,
+			message: new_message,
+			status: new_status,
+		});
+
+		if (!updateById) {
+			updateById = await updateTransactionByPaymentId(_id, {
+				payment_id: new_payment_id,
+				sender: new_sender_id,
+				receiver: new_receiver_id,
+				amount: new_amount,
+				message: new_message,
+				status: new_status,
+			});
+
+			if (!updateById)
+				return errorResponse(
+					400,
+					"ERROR",
+					"Transaction not exist with this ID",
+					res
+				);
 		}
+
+		return response(
+			200,
+			"SUCCESS",
+			updateById,
+			"Update transaction successful",
+			res
+		);
 	} catch (error) {
 		console.log(error);
 		return errorResponse(
 			400,
 			"ERROR",
 			"Failed update transaction: Internal server error",
+			res
+		);
+	}
+};
+
+export const deleteTransByIdOrPaymentId = async (
+	req: Request,
+	res: Response
+) => {
+	try {
+		const { _id } = req.params;
+
+		if (!_id)
+			return errorResponse(400, "ERROR", "Invalid or missing parameter", res);
+
+		let transaction = await deleteTransactionById(_id);
+		if (!transaction) {
+			transaction = await deleteTransactionByPaymentId(_id);
+			if (!transaction)
+				return errorResponse(400, "ERROR", "Transaction not exist", res);
+		}
+
+		return response(
+			200,
+			"SUCCESS",
+			transaction,
+			"Delete transaction successful",
+			res
+		);
+	} catch (error) {
+		return errorResponse(
+			400,
+			"ERROR",
+			"Failed delete transaction: Internal server error",
 			res
 		);
 	}
@@ -62,7 +118,7 @@ export const createNewTransaction = async (req: Request, res: Response) => {
 		const paymentID = await getTransactionByPaymentId(payment_id);
 
 		if (paymentID)
-			return errorResponse(400, "ERROR", "Transaction log existed", res);
+			return errorResponse(400, "ERROR", "Transaction log exist", res);
 
 		const senderEmail = get(req, "user.identity.email");
 
@@ -113,6 +169,38 @@ export const createNewTransaction = async (req: Request, res: Response) => {
 			400,
 			"ERROR",
 			"Failed create new transaction: Internal server error",
+			res
+		);
+	}
+};
+
+export const getTransByIdOrPaymentId = async (req: Request, res: Response) => {
+	try {
+		const { _id } = req.params;
+
+		if (!_id)
+			return errorResponse(400, "ERROR", "Invalid or missing parameter", res);
+
+		let transaction = await getTransactionById(_id);
+		if (!transaction) {
+			transaction = await getTransactionByPaymentId(_id);
+			if (!transaction)
+				return errorResponse(400, "ERROR", "Transaction not exist", res);
+		}
+
+		return response(
+			200,
+			"SUCCESS",
+			transaction,
+			"Find transaction successful",
+			res
+		);
+	} catch (error) {
+		console.log(error);
+		return errorResponse(
+			400,
+			"ERROR",
+			"Failed get a transaction: Internal server error",
 			res
 		);
 	}
