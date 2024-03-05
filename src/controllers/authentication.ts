@@ -2,7 +2,7 @@ import "dotenv/config";
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 import { response, errorResponse } from "../response";
-import { createUser, getUserByEmail } from "../db/users";
+import { createUser, getUserByEmail, getUserByUsername } from "../db/users";
 import jwt from "jsonwebtoken";
 import moment from "moment";
 import { Blacklist } from "../db/blacklists";
@@ -160,10 +160,13 @@ export const Register = async (req: Request, res: Response) => {
 			? (role = "r-fa00")
 			: (role = "r-fa07");
 
-		const existingUser = await getUserByEmail(email);
-		if (existingUser) {
+		const existingUserByEmail = await getUserByEmail(email);
+		if (existingUserByEmail)
 			return errorResponse(400, "ERROR", "User has registered!", res);
-		}
+
+		const existingUserByUsername = await getUserByUsername(username);
+		if (existingUserByUsername)
+			return errorResponse(400, "ERROR", "User has registered!", res);
 
 		const user = await createUser({
 			identity: {
