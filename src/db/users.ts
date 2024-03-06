@@ -164,7 +164,7 @@ export const updateTransactionByPaymentId = async (
 		values.status = values.status || transaction.status;
 	}
 
-	return await Transaction.findByIdAndUpdate({ payment_id }, values, {
+	return await Transaction.findByIdAndUpdate({ _id: transaction._id }, values, {
 		new: true,
 	})
 		?.populate(
