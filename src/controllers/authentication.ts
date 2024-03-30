@@ -95,7 +95,10 @@ export const Login = async (req: Request, res: Response) => {
 			secure: true,
 		};
 
-		res.cookie("token", user.authentication.sessionToken, {
+		const salt = await bcrypt.genSalt(10);
+		const hash = await bcrypt.hash(user.authentication.sessionToken, salt);
+
+		res.cookie("token", hash, {
 			...options,
 			sameSite: "none",
 		});
